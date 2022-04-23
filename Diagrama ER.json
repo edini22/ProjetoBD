@@ -1,0 +1,839 @@
+{
+    "ENTITY_ID": 19,
+    "tables": [
+        {
+            "id": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "position": {
+                "x": 129,
+                "y": 198
+            },
+            "data": {
+                "table_name": "Produto",
+                "fields": [
+                    {
+                        "fieldName": "ID",
+                        "fieldType": 3,
+                        "isPK": true,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": true
+                    },
+                    {
+                        "fieldName": "Nome",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Descricao",
+                        "fieldType": 11,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Preco",
+                        "fieldType": 4,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "5",
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Stock",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 8,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "position": {
+                "x": -802,
+                "y": 222
+            },
+            "data": {
+                "table_name": "Compra",
+                "fields": [
+                    {
+                        "fieldName": "ID",
+                        "fieldType": 3,
+                        "isPK": true,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            1,
+                            1
+                        ],
+                        "isAutoIncrement": true
+                    },
+                    {
+                        "fieldName": "valor",
+                        "fieldType": 4,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "8"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "data",
+                        "fieldType": 7,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 3,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "ea8ccf79-9971-4edd-8ded-bb0f9b98bad4",
+            "position": {
+                "x": -309,
+                "y": 212
+            },
+            "data": {
+                "table_name": "Item",
+                "fields": [
+                    {
+                        "fieldName": "Quantidade",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 2,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "74e0d063-21ff-412d-ac46-5f9d0b282fb1",
+            "position": {
+                "x": -729,
+                "y": -190
+            },
+            "data": {
+                "table_name": "Rating",
+                "fields": [
+                    {
+                        "fieldName": "ID",
+                        "fieldType": 3,
+                        "isPK": true,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": true
+                    },
+                    {
+                        "fieldName": "Valor",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Comentario",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 3,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "position": {
+                "x": 713,
+                "y": -513
+            },
+            "data": {
+                "table_name": "Utilizador",
+                "fields": [
+                    {
+                        "fieldName": "ID",
+                        "fieldType": 3,
+                        "isPK": true,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": true
+                    },
+                    {
+                        "fieldName": "Username",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": true,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Password",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Nome",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 4,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "68524d9f-85e9-49f9-9993-42a53a743875",
+            "position": {
+                "x": -232,
+                "y": -530
+            },
+            "data": {
+                "table_name": "Comprador",
+                "fields": [
+                    {
+                        "fieldName": "Morada",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 3,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "position": {
+                "x": 941,
+                "y": -260
+            },
+            "data": {
+                "table_name": "Vendedor",
+                "fields": [
+                    {
+                        "fieldName": "NIF",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 1,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "e8eb39b2-94c7-4138-a0cc-0b8a5edc8fdb",
+            "position": {
+                "x": 1185,
+                "y": -498
+            },
+            "data": {
+                "table_name": "Admin",
+                "fields": [],
+                "next_id": 1,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "position": {
+                "x": 283,
+                "y": -44
+            },
+            "data": {
+                "table_name": "Comentario",
+                "fields": [
+                    {
+                        "fieldName": "ID",
+                        "fieldType": 3,
+                        "isPK": true,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": true
+                    },
+                    {
+                        "fieldName": "Texto",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 2,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "dafdaf0e-9e7e-4cbb-af9d-ac94165d8db2",
+            "position": {
+                "x": 172,
+                "y": -452
+            },
+            "data": {
+                "table_name": "Notificacao",
+                "fields": [
+                    {
+                        "fieldName": "ID",
+                        "fieldType": 3,
+                        "isPK": true,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": true
+                    },
+                    {
+                        "fieldName": "Vista",
+                        "fieldType": 0,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            1,
+                            1
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Data",
+                        "fieldType": 7,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 4,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "c9c7b12f-0720-4ffa-a5ae-af4a49dd73b7",
+            "position": {
+                "x": 585,
+                "y": 161
+            },
+            "data": {
+                "table_name": "Televisao",
+                "fields": [
+                    {
+                        "fieldName": "Tamanho",
+                        "fieldType": 4,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "8"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Resolucao",
+                        "fieldType": 10,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "512"
+                        ],
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 2,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "bf2534e5-fba8-485a-a961-6991fd8c70d3",
+            "position": {
+                "x": 601,
+                "y": 258
+            },
+            "data": {
+                "table_name": "Telemovel",
+                "fields": [
+                    {
+                        "fieldName": "Tamanho",
+                        "fieldType": 4,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "8"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "RAM",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "ROM",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 3,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "33d0c881-367f-44c6-8272-b7c4fb0439f6",
+            "position": {
+                "x": 583,
+                "y": 373
+            },
+            "data": {
+                "table_name": "Computador",
+                "fields": [
+                    {
+                        "fieldName": "Processador",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "RAM",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "ROM",
+                        "fieldType": 2,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 3,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "22ac34e0-bb83-4b68-abac-7c833da456a1",
+            "position": {
+                "x": -140,
+                "y": -249
+            },
+            "data": {
+                "table_name": "Detalhes_Compra",
+                "fields": [],
+                "next_id": 1,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "37fc55e9-c701-42e6-870e-3465e782054f",
+            "position": {
+                "x": 287,
+                "y": -309
+            },
+            "data": {
+                "table_name": "Normal",
+                "fields": [],
+                "next_id": 2,
+                "checkName": [],
+                "checkCondition": []
+            }
+        },
+        {
+            "id": "ccb63955-69b2-4f57-b13a-8fd64d9689c1",
+            "position": {
+                "x": 145,
+                "y": 440
+            },
+            "data": {
+                "table_name": "Historico",
+                "fields": [
+                    {
+                        "fieldName": "Preco",
+                        "fieldType": 4,
+                        "isPK": false,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": [
+                            "8"
+                        ],
+                        "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "Data",
+                        "fieldType": 7,
+                        "isPK": false,
+                        "isNotNull": false,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
+                    }
+                ],
+                "next_id": 4,
+                "checkName": [],
+                "checkCondition": []
+            }
+        }
+    ],
+    "links": [
+        {
+            "source": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "target": "ea8ccf79-9971-4edd-8ded-bb0f9b98bad4",
+            "order": "normal",
+            "sourceCard": "1:1",
+            "targetCard": "0:n",
+            "label": "Contem",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": true
+        },
+        {
+            "source": "68524d9f-85e9-49f9-9993-42a53a743875",
+            "target": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "target": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "e8eb39b2-94c7-4138-a0cc-0b8a5edc8fdb",
+            "target": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "order": "normal",
+            "sourceCard": "0:n",
+            "targetCard": "1:1",
+            "label": "Possui",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "target": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "order": "normal",
+            "sourceCard": "0:1",
+            "targetCard": "0:n",
+            "label": "Resposta",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "74e0d063-21ff-412d-ac46-5f9d0b282fb1",
+            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "order": "normal",
+            "sourceCard": "0:n",
+            "targetCard": "1:1",
+            "label": "",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "c9c7b12f-0720-4ffa-a5ae-af4a49dd73b7",
+            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "bf2534e5-fba8-485a-a961-6991fd8c70d3",
+            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "33d0c881-367f-44c6-8272-b7c4fb0439f6",
+            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "74e0d063-21ff-412d-ac46-5f9d0b282fb1",
+            "target": "68524d9f-85e9-49f9-9993-42a53a743875",
+            "order": "normal",
+            "sourceCard": "0:1",
+            "targetCard": "1:1",
+            "label": "Possui/Faz",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "37fc55e9-c701-42e6-870e-3465e782054f",
+            "target": "dafdaf0e-9e7e-4cbb-af9d-ac94165d8db2",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "22ac34e0-bb83-4b68-abac-7c833da456a1",
+            "target": "dafdaf0e-9e7e-4cbb-af9d-ac94165d8db2",
+            "order": "parenting",
+            "sourceCard": "0:1",
+            "targetCard": "0:1",
+            "label": "complete",
+            "hierType": "complete",
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "target": "37fc55e9-c701-42e6-870e-3465e782054f",
+            "order": "normal",
+            "sourceCard": "1:1",
+            "targetCard": "1:1",
+            "label": "Gera",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "22ac34e0-bb83-4b68-abac-7c833da456a1",
+            "target": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "order": "normal",
+            "sourceCard": "1:1",
+            "targetCard": "1:1",
+            "label": "Detalhes",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "target": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "order": "normal",
+            "sourceCard": "0:n",
+            "targetCard": "1:1",
+            "label": "Vende",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "68524d9f-85e9-49f9-9993-42a53a743875",
+            "target": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "order": "normal",
+            "sourceCard": "1:1",
+            "targetCard": "0:n",
+            "label": "Faz",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "22ac34e0-bb83-4b68-abac-7c833da456a1",
+            "target": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "order": "normal",
+            "sourceCard": "0:n",
+            "targetCard": "1:1",
+            "label": "Notificado",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "target": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "order": "normal",
+            "sourceCard": "1:1",
+            "targetCard": "0:n",
+            "label": "Possui/Faz",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
+        },
+        {
+            "source": "ccb63955-69b2-4f57-b13a-8fd64d9689c1",
+            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "order": "normal",
+            "sourceCard": "1:n",
+            "targetCard": "1:1",
+            "label": "Gera",
+            "hierType": null,
+            "sourceisweak": true,
+            "targetisweak": false
+        },
+        {
+            "source": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "target": "ea8ccf79-9971-4edd-8ded-bb0f9b98bad4",
+            "order": "normal",
+            "sourceCard": "1:1",
+            "targetCard": "1:n",
+            "label": "new relation",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": true
+        }
+    ],
+    "normalization": 0,
+    "database": 0
+}
