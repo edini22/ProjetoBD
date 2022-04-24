@@ -3,5 +3,5 @@
 
 ## Devs
 
-Eduardo Figueiredo
+Eduardo Figueiredo<br/>
 Fábio Santos

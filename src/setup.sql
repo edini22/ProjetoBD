@@ -1,18 +1,18 @@
 -- Eliminar tableas se existirem
--- DROP TABLE IF EXISTS televisoes;
--- DROP TABLE IF EXISTS telemoveis;
--- DROP TABLE IF EXISTS computadores;
--- DROP TABLE IF EXISTS produtos;
--- DROP TABLE IF EXISTS itens;
--- DROP TABLE IF EXISTS ratings;
--- DROP TABLE IF EXISTS compradores;
--- DROP TABLE IF EXISTS vendedors;
--- DROP TABLE IF EXISTS admins;
--- DROP TABLE IF EXISTS utilizadores;
--- DROP TABLE IF EXISTS comentario_normal;
--- DROP TABLE IF EXISTS notificacoes;
--- DROP TABLE IF EXISTS compras;
--- DROP TABLE IF EXISTS historico;
+DROP TABLE IF EXISTS televisoes;
+DROP TABLE IF EXISTS telemoveis;
+DROP TABLE IF EXISTS computadores;
+DROP TABLE IF EXISTS itens;
+DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS comentario_normal;
+DROP TABLE IF EXISTS historico;
+DROP TABLE IF EXISTS produtos;
+DROP TABLE IF EXISTS compras;
+DROP TABLE IF EXISTS compradores;
+DROP TABLE IF EXISTS vendedores;
+DROP TABLE IF EXISTS admins;
+DROP TABLE IF EXISTS utilizadores;
+DROP TABLE IF EXISTS notificacoes;
 
 -- Criar tabelas da DataBase
 CREATE TABLE produtos (
@@ -21,7 +21,7 @@ CREATE TABLE produtos (
 	descricao VARCHAR(512),
 	preco FLOAT(5) NOT NULL,
 	stock INTEGER NOT NULL,
-	vendedor_id BIGINT NOT NULL UNIQUE,
+	vendedor_id BIGINT NOT NULL,
 	PRIMARY KEY(id)
 );
 
@@ -51,14 +51,14 @@ CREATE TABLE utilizadores (
 );
 
 CREATE TABLE compradores (
-	morada VARCHAR(512) NOT NULL,
 	utilizador_id BIGINT UNIQUE,
+	morada VARCHAR(512) NOT NULL,
 	PRIMARY KEY(utilizador_id)
 );
 
 CREATE TABLE vendedores (
-	nif INTEGER NOT NULL,
 	utilizador_id BIGINT UNIQUE,
+	nif INTEGER NOT NULL,
 	PRIMARY KEY(utilizador_id)
 );
 
@@ -103,6 +103,7 @@ CREATE TABLE computadores (
 	processador INTEGER NOT NULL,
 	ram INTEGER NOT NULL,
 	rom INTEGER NOT NULL,
+	grafica VARCHAR(512),
 	produto_id BIGINT NOT NULL UNIQUE,
 	PRIMARY KEY(produto_id)
 );
