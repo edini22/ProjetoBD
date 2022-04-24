@@ -23,25 +23,25 @@ DECLARE
     id INT;
 BEGIN
     SELECT utilizador_id INTO id FROM vendedores, utilizadores u
-    WHERE u.username = UN and u.id = vendedores.utilizador_id;
+    WHERE u.username like UN and u.id = vendedores.utilizador_id;
     RETURN id;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Devolve o id do produto dando o seu nome e o id do vendedor
 -- TODO: 
--- CREATE OR REPLACE FUNCTION ID_PRODUTO(string VARCHAR, vendedor INT)
--- RETURNS INT
--- AS
--- $$
--- DECLARE
---     idd INT;
--- BEGIN
---     SELECT id INTO idd FROM produtos
---     WHERE produtos.nome = string; 
---     RETURN idd;
--- END;
--- $$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION ID_PRODUTO(string VARCHAR, vendedor INT)
+RETURNS INT
+AS
+$$
+DECLARE
+    idd INT;
+BEGIN
+    SELECT id INTO idd FROM produtos
+    WHERE produtos.nome like string and produtos.vendedor_id = vendedor; 
+    RETURN idd;
+END;
+$$ LANGUAGE plpgsql;
 
 
 -- Users ============================================================================
@@ -72,8 +72,9 @@ INSERT INTO vendedores (utilizador_id, nif) VALUES (ID_USER('techmania'), 624786
 -- Computadores
 
 INSERT INTO produtos (nome, descricao, preco, stock, vendedor_id) VALUES ('Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,ID_VENDEDOR('techmania'));
--- INSERT INTO computadores (processador, ram, rom, grafica, produto_id) VALUES ('Intel i7 12700k', 16, 1024, 'RTX 3060', ID_PRODUTO('Computador1'));
+INSERT INTO computadores (processador, ram, rom, grafica, produto_id) VALUES ('Intel i7 12700k', 16, 1024, 'RTX 3060', ID_PRODUTO('Computador1',ID_VENDEDOR('techmania')));
 -- INSERT INTO produtos (nome, descricao, preco, stock, vendedor_id) VALUES ('Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000, 1,ID_VENDEDOR('infortech'));
+INSERT INTO computadores (processador, ram, rom, grafica, produto_id) VALUES ('Intel i7 12700k', 16, 1024, 'RTX 3060', ID_PRODUTO('Computador1',ID_VENDEDOR('infortech')));
 INSERT INTO produtos (nome, descricao, preco, stock, vendedor_id) VALUES ('Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,ID_VENDEDOR('infortech'));
 
 

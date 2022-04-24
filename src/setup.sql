@@ -100,7 +100,7 @@ CREATE TABLE telemoveis (
 );
 
 CREATE TABLE computadores (
-	processador INTEGER NOT NULL,
+	processador VARCHAR(512) NOT NULL,
 	ram INTEGER NOT NULL,
 	rom INTEGER NOT NULL,
 	grafica VARCHAR(512),
