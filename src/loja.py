@@ -1,3 +1,4 @@
+from crypt import methods
 import flask
 import psycopg2
 import logging
@@ -25,7 +26,9 @@ def db_connection():
     return db
 
 # ENDPOINTS =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-# GET's ==========================================================================
+
+# FIXME: verificar os endpoints onde esta dbproj
+
 
 @app.route('/')
 def landing_page():
@@ -33,10 +36,30 @@ def landing_page():
     Bem vindo à loja DataStore!
     Comece as suas compras assim que possível :)
     
+    Para se registar use o Endpoint http://localhost:8080/dbproj/user (POST)
+    Para se autenticar use o Endpoint http://localhost:8080/dbproj/user (PUT)
+    
     Fábio Santos 2020212310
     Eduardo Figueiredo 2020213717
     """
 
+# LOGIN ==========================================================================
+# FIXME: verificar os endpoints onde esta dbproj
+
+
+@app.route('/user/', methods=['POST'])
+def new_user():
+    # TODO:
+    pass
+
+
+@app.route('/user/', methods=['PUT'])
+def login():
+    # TODO:
+    pass
+
+
+# GET's ==========================================================================
 
 # http://localhost:8080/produtos/
 
@@ -121,7 +144,8 @@ def get_all_buyers():
         Results = []
         for row in rows:
             logger.debug(row)
-            content = {'Nome': row[0], 'ID': int(row[1]), 'Username': row[2], 'Morada': row[3]}
+            content = {'Nome': row[0], 'ID': int(
+                row[1]), 'Username': row[2], 'Morada': row[3]}
             Results.append(content)
 
         reponse = {'Status': StatusCodes['success'], 'results': Results}
@@ -154,7 +178,8 @@ def get_all_sellers():
         Results = []
         for row in rows:
             logger.debug(row)
-            content = {'Nome': row[0], 'ID': int(row[1]), 'Username': row[2], 'NIF': row[3]}
+            content = {'Nome': row[0], 'ID': int(
+                row[1]), 'Username': row[2], 'NIF': row[3]}
             Results.append(content)
 
         reponse = {'Status': StatusCodes['success'], 'results': Results}
@@ -171,9 +196,47 @@ def get_all_sellers():
     return flask.jsonify(reponse)
 
 
-# POST's =========================================================================
+# Produtos =======================================================================
 
-#TODO: 
+# http://localhost:8080/product
+@app.route('/produto/', methods=['POST'])
+def new_product():
+    # TODO:
+    pass
+
+# http://localhost:8080/product/{produto_id}
+@app.route('/produto/<produto_id>', methods=['PUT'])
+def change_product(id_produto):
+    # TODO:
+    pass
+
+# Compra =========================================================================
+
+#http://localhost:8080/order
+@app.rout('/compra/', methods=['POST'])
+def order():
+    # TODO:
+    pass
+
+# Rating =========================================================================
+
+#http://localhost:8080/rating/{produto_id}
+@app.route('/ratings/<produto_id>')
+def rating(produto_id):
+    # TODO:
+    pass
+
+# Comentario =====================================================================
+
+# http://localhost:8080/questions/{produto_id}
+# http://localhost:8080/questions/{produto_id}/{comentario_pai_id}
+
+@app.route('/comentario_normal/<produto_id>')
+def comment(produto_id):
+    # TODO:
+    pass
+
+
 
 if __name__ == '__main__':
 
@@ -185,8 +248,7 @@ if __name__ == '__main__':
     ch.setLevel(logging.DEBUG)
 
     # create formatter
-    formatter = logging.Formatter(
-        '%(asctime)s [%(levelname)s]:  %(message)s', '%H:%M:%S')
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s]:  %(message)s', '%H:%M:%S')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 

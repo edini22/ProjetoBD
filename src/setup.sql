@@ -71,7 +71,7 @@ CREATE TABLE comentario_normal (
 	id SERIAL,
 	texto VARCHAR(512) NOT NULL,
 	utilizador_id BIGINT NOT NULL UNIQUE,
-	notificacao_normal_id BIGINT NOT NULL UNIQUE,
+	notificacao_normal_id BIGINT NOT NULL, -- Retirei o Unique pq nao sei se ia afetar um comentario ter varias respostas por exemplo
 	produto_id BIGINT NOT NULL UNIQUE,
 	notificacao_id BIGINT NOT NULL UNIQUE,
 	PRIMARY KEY(notificacao_id)
