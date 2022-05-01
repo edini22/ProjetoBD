@@ -1,10 +1,10 @@
 {
-    "ENTITY_ID": 19,
+    "ENTITY_ID": 20,
     "tables": [
         {
-            "id": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "id": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
             "position": {
-                "x": 129,
+                "x": 135,
                 "y": 198
             },
             "data": {
@@ -63,15 +63,25 @@
                         "defaultValue": "",
                         "args": "",
                         "isAutoIncrement": false
+                    },
+                    {
+                        "fieldName": "versao",
+                        "fieldType": 2,
+                        "isPK": true,
+                        "isNotNull": true,
+                        "isUnique": false,
+                        "defaultValue": "",
+                        "args": "",
+                        "isAutoIncrement": false
                     }
                 ],
-                "next_id": 8,
+                "next_id": 9,
                 "checkName": [],
                 "checkCondition": []
             }
         },
         {
-            "id": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "id": "a82121b9-767e-41b3-846e-b4a43ecc8620",
             "position": {
                 "x": -802,
                 "y": 222
@@ -121,7 +131,7 @@
             }
         },
         {
-            "id": "ea8ccf79-9971-4edd-8ded-bb0f9b98bad4",
+            "id": "4f4cdc8c-2441-48cb-9ae0-5ba0ed2c0110",
             "position": {
                 "x": -309,
                 "y": 212
@@ -146,7 +156,7 @@
             }
         },
         {
-            "id": "74e0d063-21ff-412d-ac46-5f9d0b282fb1",
+            "id": "cb86032d-c0f8-43af-8770-92865386cca2",
             "position": {
                 "x": -729,
                 "y": -190
@@ -154,16 +164,6 @@
             "data": {
                 "table_name": "Rating",
                 "fields": [
-                    {
-                        "fieldName": "ID",
-                        "fieldType": 3,
-                        "isPK": true,
-                        "isNotNull": false,
-                        "isUnique": false,
-                        "defaultValue": "",
-                        "args": "",
-                        "isAutoIncrement": true
-                    },
                     {
                         "fieldName": "Valor",
                         "fieldType": 2,
@@ -193,7 +193,7 @@
             }
         },
         {
-            "id": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "id": "950d76e2-b3de-4f6e-8ae2-6554f2f5445b",
             "position": {
                 "x": 713,
                 "y": -513
@@ -254,7 +254,7 @@
             }
         },
         {
-            "id": "68524d9f-85e9-49f9-9993-42a53a743875",
+            "id": "c761f7fe-05f1-4c76-bf9e-f8835ed54704",
             "position": {
                 "x": -232,
                 "y": -530
@@ -281,7 +281,7 @@
             }
         },
         {
-            "id": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "id": "c95c51b6-43e7-4646-9b19-d1be2476c373",
             "position": {
                 "x": 941,
                 "y": -260
@@ -306,7 +306,7 @@
             }
         },
         {
-            "id": "e8eb39b2-94c7-4138-a0cc-0b8a5edc8fdb",
+            "id": "1cc29083-db80-49b3-91f3-19da8f043b77",
             "position": {
                 "x": 1185,
                 "y": -498
@@ -320,7 +320,7 @@
             }
         },
         {
-            "id": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "id": "6fbca70e-3499-4dba-8543-07b8fa99972f",
             "position": {
                 "x": 283,
                 "y": -44
@@ -357,7 +357,7 @@
             }
         },
         {
-            "id": "dafdaf0e-9e7e-4cbb-af9d-ac94165d8db2",
+            "id": "f12e7fbb-5804-4b44-86d4-6c2970d379cc",
             "position": {
                 "x": 172,
                 "y": -452
@@ -405,7 +405,7 @@
             }
         },
         {
-            "id": "c9c7b12f-0720-4ffa-a5ae-af4a49dd73b7",
+            "id": "c460058d-8781-4c4e-b093-995d08564d47",
             "position": {
                 "x": 585,
                 "y": 161
@@ -444,7 +444,7 @@
             }
         },
         {
-            "id": "bf2534e5-fba8-485a-a961-6991fd8c70d3",
+            "id": "c8c9194d-86c3-4ce7-85a8-6ee8ee6c5418",
             "position": {
                 "x": 601,
                 "y": 258
@@ -491,7 +491,7 @@
             }
         },
         {
-            "id": "33d0c881-367f-44c6-8272-b7c4fb0439f6",
+            "id": "3cec947e-84a0-421c-bfaf-a4e2de2bbfc2",
             "position": {
                 "x": 583,
                 "y": 373
@@ -536,7 +536,7 @@
             }
         },
         {
-            "id": "22ac34e0-bb83-4b68-abac-7c833da456a1",
+            "id": "3970bc07-80ba-4cf4-896f-4a59f049c72b",
             "position": {
                 "x": -140,
                 "y": -249
@@ -550,7 +550,7 @@
             }
         },
         {
-            "id": "37fc55e9-c701-42e6-870e-3465e782054f",
+            "id": "1de08f6b-1035-4aac-aa7b-420105857b36",
             "position": {
                 "x": 287,
                 "y": -309
@@ -564,38 +564,28 @@
             }
         },
         {
-            "id": "ccb63955-69b2-4f57-b13a-8fd64d9689c1",
+            "id": "95843652-9ea5-4ad3-8f0a-5e843b7a17f7",
             "position": {
-                "x": 145,
-                "y": 440
+                "x": 709,
+                "y": -734
             },
             "data": {
-                "table_name": "Historico",
+                "table_name": "Token_login",
                 "fields": [
                     {
-                        "fieldName": "Preco",
-                        "fieldType": 4,
-                        "isPK": false,
-                        "isNotNull": true,
-                        "isUnique": false,
-                        "defaultValue": "",
-                        "args": [
-                            "8"
-                        ],
-                        "isAutoIncrement": false
-                    },
-                    {
-                        "fieldName": "Data",
-                        "fieldType": 7,
-                        "isPK": false,
+                        "fieldName": "token",
+                        "fieldType": 10,
+                        "isPK": true,
                         "isNotNull": false,
                         "isUnique": false,
                         "defaultValue": "",
-                        "args": "",
+                        "args": [
+                            "512"
+                        ],
                         "isAutoIncrement": false
                     }
                 ],
-                "next_id": 4,
+                "next_id": 1,
                 "checkName": [],
                 "checkCondition": []
             }
@@ -603,8 +593,8 @@
     ],
     "links": [
         {
-            "source": "b92a451a-f3f3-4586-92c4-1056236944d7",
-            "target": "ea8ccf79-9971-4edd-8ded-bb0f9b98bad4",
+            "source": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
+            "target": "4f4cdc8c-2441-48cb-9ae0-5ba0ed2c0110",
             "order": "normal",
             "sourceCard": "1:1",
             "targetCard": "0:n",
@@ -614,8 +604,8 @@
             "targetisweak": true
         },
         {
-            "source": "68524d9f-85e9-49f9-9993-42a53a743875",
-            "target": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "source": "c761f7fe-05f1-4c76-bf9e-f8835ed54704",
+            "target": "950d76e2-b3de-4f6e-8ae2-6554f2f5445b",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -625,8 +615,8 @@
             "targetisweak": false
         },
         {
-            "source": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
-            "target": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "source": "c95c51b6-43e7-4646-9b19-d1be2476c373",
+            "target": "950d76e2-b3de-4f6e-8ae2-6554f2f5445b",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -636,8 +626,8 @@
             "targetisweak": false
         },
         {
-            "source": "e8eb39b2-94c7-4138-a0cc-0b8a5edc8fdb",
-            "target": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
+            "source": "1cc29083-db80-49b3-91f3-19da8f043b77",
+            "target": "950d76e2-b3de-4f6e-8ae2-6554f2f5445b",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -647,8 +637,8 @@
             "targetisweak": false
         },
         {
-            "source": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
-            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "source": "6fbca70e-3499-4dba-8543-07b8fa99972f",
+            "target": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
             "order": "normal",
             "sourceCard": "0:n",
             "targetCard": "1:1",
@@ -658,8 +648,8 @@
             "targetisweak": false
         },
         {
-            "source": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
-            "target": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "source": "6fbca70e-3499-4dba-8543-07b8fa99972f",
+            "target": "6fbca70e-3499-4dba-8543-07b8fa99972f",
             "order": "normal",
             "sourceCard": "0:1",
             "targetCard": "0:n",
@@ -669,19 +659,19 @@
             "targetisweak": false
         },
         {
-            "source": "74e0d063-21ff-412d-ac46-5f9d0b282fb1",
-            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "source": "cb86032d-c0f8-43af-8770-92865386cca2",
+            "target": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
             "order": "normal",
             "sourceCard": "0:n",
             "targetCard": "1:1",
-            "label": "",
+            "label": "possui",
             "hierType": null,
-            "sourceisweak": false,
+            "sourceisweak": true,
             "targetisweak": false
         },
         {
-            "source": "c9c7b12f-0720-4ffa-a5ae-af4a49dd73b7",
-            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "source": "c460058d-8781-4c4e-b093-995d08564d47",
+            "target": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -691,8 +681,8 @@
             "targetisweak": false
         },
         {
-            "source": "bf2534e5-fba8-485a-a961-6991fd8c70d3",
-            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "source": "c8c9194d-86c3-4ce7-85a8-6ee8ee6c5418",
+            "target": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -702,8 +692,8 @@
             "targetisweak": false
         },
         {
-            "source": "33d0c881-367f-44c6-8272-b7c4fb0439f6",
-            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
+            "source": "3cec947e-84a0-421c-bfaf-a4e2de2bbfc2",
+            "target": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -713,10 +703,10 @@
             "targetisweak": false
         },
         {
-            "source": "74e0d063-21ff-412d-ac46-5f9d0b282fb1",
-            "target": "68524d9f-85e9-49f9-9993-42a53a743875",
+            "source": "cb86032d-c0f8-43af-8770-92865386cca2",
+            "target": "c761f7fe-05f1-4c76-bf9e-f8835ed54704",
             "order": "normal",
-            "sourceCard": "0:1",
+            "sourceCard": "0:n",
             "targetCard": "1:1",
             "label": "Possui/Faz",
             "hierType": null,
@@ -724,8 +714,8 @@
             "targetisweak": false
         },
         {
-            "source": "37fc55e9-c701-42e6-870e-3465e782054f",
-            "target": "dafdaf0e-9e7e-4cbb-af9d-ac94165d8db2",
+            "source": "1de08f6b-1035-4aac-aa7b-420105857b36",
+            "target": "f12e7fbb-5804-4b44-86d4-6c2970d379cc",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -735,8 +725,8 @@
             "targetisweak": false
         },
         {
-            "source": "22ac34e0-bb83-4b68-abac-7c833da456a1",
-            "target": "dafdaf0e-9e7e-4cbb-af9d-ac94165d8db2",
+            "source": "3970bc07-80ba-4cf4-896f-4a59f049c72b",
+            "target": "f12e7fbb-5804-4b44-86d4-6c2970d379cc",
             "order": "parenting",
             "sourceCard": "0:1",
             "targetCard": "0:1",
@@ -746,8 +736,8 @@
             "targetisweak": false
         },
         {
-            "source": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
-            "target": "37fc55e9-c701-42e6-870e-3465e782054f",
+            "source": "6fbca70e-3499-4dba-8543-07b8fa99972f",
+            "target": "1de08f6b-1035-4aac-aa7b-420105857b36",
             "order": "normal",
             "sourceCard": "1:1",
             "targetCard": "1:1",
@@ -757,8 +747,8 @@
             "targetisweak": false
         },
         {
-            "source": "22ac34e0-bb83-4b68-abac-7c833da456a1",
-            "target": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "source": "3970bc07-80ba-4cf4-896f-4a59f049c72b",
+            "target": "a82121b9-767e-41b3-846e-b4a43ecc8620",
             "order": "normal",
             "sourceCard": "1:1",
             "targetCard": "1:1",
@@ -768,8 +758,8 @@
             "targetisweak": false
         },
         {
-            "source": "b92a451a-f3f3-4586-92c4-1056236944d7",
-            "target": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "source": "4ae6112f-bbdc-41a9-9b80-0458b1bf6b90",
+            "target": "c95c51b6-43e7-4646-9b19-d1be2476c373",
             "order": "normal",
             "sourceCard": "0:n",
             "targetCard": "1:1",
@@ -779,8 +769,8 @@
             "targetisweak": false
         },
         {
-            "source": "68524d9f-85e9-49f9-9993-42a53a743875",
-            "target": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
+            "source": "c761f7fe-05f1-4c76-bf9e-f8835ed54704",
+            "target": "a82121b9-767e-41b3-846e-b4a43ecc8620",
             "order": "normal",
             "sourceCard": "1:1",
             "targetCard": "0:n",
@@ -790,8 +780,8 @@
             "targetisweak": false
         },
         {
-            "source": "22ac34e0-bb83-4b68-abac-7c833da456a1",
-            "target": "6dac0c58-0c34-41fc-a9ef-6cf873a57de7",
+            "source": "3970bc07-80ba-4cf4-896f-4a59f049c72b",
+            "target": "c95c51b6-43e7-4646-9b19-d1be2476c373",
             "order": "normal",
             "sourceCard": "0:n",
             "targetCard": "1:1",
@@ -801,8 +791,8 @@
             "targetisweak": false
         },
         {
-            "source": "29d65105-de09-4f24-ab1f-9f8703ddba9f",
-            "target": "26a9be96-c46f-4cfb-980b-2a12ee7f97f7",
+            "source": "950d76e2-b3de-4f6e-8ae2-6554f2f5445b",
+            "target": "6fbca70e-3499-4dba-8543-07b8fa99972f",
             "order": "normal",
             "sourceCard": "1:1",
             "targetCard": "0:n",
@@ -812,19 +802,8 @@
             "targetisweak": false
         },
         {
-            "source": "ccb63955-69b2-4f57-b13a-8fd64d9689c1",
-            "target": "b92a451a-f3f3-4586-92c4-1056236944d7",
-            "order": "normal",
-            "sourceCard": "1:n",
-            "targetCard": "1:1",
-            "label": "Gera",
-            "hierType": null,
-            "sourceisweak": true,
-            "targetisweak": false
-        },
-        {
-            "source": "73d0d8d3-86d0-4b15-9074-ae8de430e92c",
-            "target": "ea8ccf79-9971-4edd-8ded-bb0f9b98bad4",
+            "source": "a82121b9-767e-41b3-846e-b4a43ecc8620",
+            "target": "4f4cdc8c-2441-48cb-9ae0-5ba0ed2c0110",
             "order": "normal",
             "sourceCard": "1:1",
             "targetCard": "1:n",
@@ -832,6 +811,17 @@
             "hierType": null,
             "sourceisweak": false,
             "targetisweak": true
+        },
+        {
+            "source": "95843652-9ea5-4ad3-8f0a-5e843b7a17f7",
+            "target": "950d76e2-b3de-4f6e-8ae2-6554f2f5445b",
+            "order": "normal",
+            "sourceCard": "0:1",
+            "targetCard": "1:1",
+            "label": "possui",
+            "hierType": null,
+            "sourceisweak": false,
+            "targetisweak": false
         }
     ],
     "normalization": 0,

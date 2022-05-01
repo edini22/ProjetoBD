@@ -1,4 +1,3 @@
-from crypt import methods
 import flask
 import psycopg2
 import logging
@@ -12,6 +11,10 @@ StatusCodes = {
 }
 
 # Acesso a DataBase
+#DEBUG: comprador pode fazer varios ratings!!
+#rating pode ser uma chave fraca 
+#produtos, retirar a tabela do historico e colocar um atributo de versao!, retirar o id de unique!!
+#alguns autoincremnete, é melhor retirar !!
 
 
 def db_connection():
@@ -213,7 +216,7 @@ def change_product(id_produto):
 # Compra =========================================================================
 
 #http://localhost:8080/order
-@app.rout('/compra/', methods=['POST'])
+@app.route('/compra/', methods=['POST'])
 def order():
     # TODO:
     pass
@@ -221,7 +224,7 @@ def order():
 # Rating =========================================================================
 
 #http://localhost:8080/rating/{produto_id}
-@app.route('/ratings/<produto_id>')
+@app.route('/ratings/<produto_id>',methods=['POST'])
 def rating(produto_id):
     # TODO:
     pass
@@ -231,7 +234,7 @@ def rating(produto_id):
 # http://localhost:8080/questions/{produto_id}
 # http://localhost:8080/questions/{produto_id}/{comentario_pai_id}
 
-@app.route('/comentario_normal/<produto_id>')
+@app.route('/comentario_normal/<produto_id>',methods=['POST'])
 def comment(produto_id):
     # TODO:
     pass
