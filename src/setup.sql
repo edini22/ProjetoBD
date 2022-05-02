@@ -1,35 +1,36 @@
 -- Eliminar tableas se existirem
-DROP TABLE IF EXISTS token_login;
+DROP TABLE IF EXISTS admins;
+DROP TABLE IF EXISTS comentario_normal;
+DROP TABLE IF EXISTS computadores;
 DROP TABLE IF EXISTS televisoes;
 DROP TABLE IF EXISTS telemoveis;
-DROP TABLE IF EXISTS computadores;
 DROP TABLE IF EXISTS itens;
 DROP TABLE IF EXISTS ratings;
-DROP TABLE IF EXISTS comentario_normal;
 DROP TABLE IF EXISTS produtos;
 DROP TABLE IF EXISTS compras;
 DROP TABLE IF EXISTS compradores;
 DROP TABLE IF EXISTS vendedores;
-DROP TABLE IF EXISTS admins;
-DROP TABLE IF EXISTS utilizadores;
 DROP TABLE IF EXISTS notificacoes;
+DROP TABLE IF EXISTS utilizadores;
 
 -- Criar tabelas da DataBase
 CREATE TABLE produtos (
-	id  BIGINT ,
+	id  BIGINT NOT NULL,
 	nome VARCHAR(512) NOT NULL,
 	descricao VARCHAR(512),
 	preco FLOAT(5) NOT NULL,
 	stock INTEGER NOT NULL,
 	versao		 INTEGER NOT NULL,
 	vendedor_id BIGINT NOT NULL,
-	PRIMARY KEY(id,versao)
+	UNIQUE(id,versao),
+	PRIMARY KEY(id)
 );
 
 CREATE TABLE itens (
 	quantidade INTEGER NOT NULL,
-	compra_id BIGINT UNIQUE,
-	produto_id BIGINT UNIQUE,
+	compra_id BIGINT,
+	produto_id BIGINT ,
+	versao_produto INTEGER NOT NULL,
 	notificacao_compra_id BIGINT NOT NULL UNIQUE, 
 	PRIMARY KEY(compra_id, produto_id)
 );
@@ -87,7 +88,7 @@ CREATE TABLE notificacoes (
 CREATE TABLE televisoes (
 	tamanho FLOAT(8) NOT NULL,
 	resolucao VARCHAR(512) NOT NULL,
-	produto_id BIGINT NOT NULL UNIQUE,
+	produto_id BIGINT NOT NULL ,
 	PRIMARY KEY(produto_id)
 );
 
@@ -95,7 +96,7 @@ CREATE TABLE telemoveis (
 	tamanho FLOAT(8) NOT NULL,
 	ram INTEGER NOT NULL,
 	rom INTEGER NOT NULL,
-	produto_id BIGINT NOT NULL UNIQUE,
+	produto_id BIGINT NOT NULL,
 	PRIMARY KEY(produto_id)
 );
 
@@ -104,7 +105,7 @@ CREATE TABLE computadores (
 	ram INTEGER NOT NULL,
 	rom INTEGER NOT NULL,
 	grafica VARCHAR(512),
-	produto_id BIGINT NOT NULL UNIQUE,
+	produto_id BIGINT NOT NULL,
 	PRIMARY KEY(produto_id)
 );
 
@@ -118,18 +119,19 @@ CREATE TABLE compras (
 	PRIMARY KEY(compra_id)
 );
 
-CREATE TABLE token_login (
-	token	 VARCHAR(512) UNIQUE NOT NULL,
-	utilizador_id BIGINT UNIQUE NOT NULL,
-	PRIMARY KEY(token)
-);
+-- CREATE TABLE token_login (
+-- 	token	 VARCHAR(512) UNIQUE NOT NULL,
+-- 	utilizador_id BIGINT UNIQUE NOT NULL,
+-- 	PRIMARY KEY(token)
+-- );
+
 -- Adicionar as FK nas tabelas
 ALTER TABLE produtos
 ADD CONSTRAINT produtos_fk1 FOREIGN KEY (vendedor_id) REFERENCES vendedores(utilizador_id);
 ALTER TABLE itens
 ADD CONSTRAINT itens_fk1 FOREIGN KEY (compra_id) REFERENCES compras(compra_id);
 ALTER TABLE itens
-ADD CONSTRAINT itens_fk2 FOREIGN KEY (produto_id) REFERENCES produtos(id);
+ADD CONSTRAINT itens_fk2 FOREIGN KEY (produto_id,versao_produto) REFERENCES produtos(id,versao);
 ALTER TABLE itens
 ADD CONSTRAINT itens_fk3 FOREIGN KEY (notificacao_compra_id) REFERENCES compras(notificacao_id);
 ALTER TABLE ratings
@@ -162,6 +164,4 @@ ALTER TABLE compras
 ADD CONSTRAINT compras_fk2 FOREIGN KEY (comprador_id) REFERENCES compradores(utilizador_id);
 ALTER TABLE compras
 ADD CONSTRAINT compras_fk3 FOREIGN KEY (notificacao_id) REFERENCES notificacoes(id);
-ALTER TABLE historico
-ADD CONSTRAINT historico_fk1 FOREIGN KEY (produto_id) REFERENCES produtos(id);
-ALTER TABLE token_login ADD CONSTRAINT token_login_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizador(id);
+-- ALTER TABLE token_login ADD CONSTRAINT token_login_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizador(id);

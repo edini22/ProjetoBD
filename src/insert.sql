@@ -66,9 +66,25 @@ DECLARE
 END;
 $$ LANGUAGE plpgsql;
 
+--TODO: --Devolve maxima versao  da tabela produtos
+-- CREATE OR REPLACE FUNCTION max_versao(string VARCHAR, vendedor INT)
+-- RETURNS INT
+-- AS
+-- $$
+-- DECLARE
+--     idd INT;
+-- BEGIN
+--     SELECT MAX(versao) INTO idd FROM produtos
+--     WHERE produtos.nome like string and produtos.vendedor_id = vendedor  ; 
+--     RETURN idd;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
 
 -- Devolve o id do produto dando o seu nome e o id do vendedor
+    --QUESTION: Se por quealquer razao se colocar mos a guardo o historico da ram, etc de um produto teremos que colocar a busca pela versao tb
 -- TODO: 
+DROP FUNCTION ID_PRODUTO;
 CREATE OR REPLACE FUNCTION ID_PRODUTO(string VARCHAR, vendedor INT)
 RETURNS INT
 AS
@@ -77,20 +93,42 @@ DECLARE
     idd INT;
 BEGIN
     SELECT id INTO idd FROM produtos
-    WHERE produtos.nome like string and produtos.vendedor_id = vendedor; 
+    GROUP BY id HAVING vendedor_id = vendedor and produtos.nome like string ; 
     RETURN idd;
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+--Devolve max id da tabela produtos
+CREATE OR REPLACE FUNCTION max_id()
+RETURNS INT
+AS
+$$
+DECLARE
+    idd INT;
+BEGIN
+    SELECT MAX(id) INTO idd FROM produtos; 
+    IF idd is NULL THEN
+     idd := 0;
+    END IF;
+    RETURN idd;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- insere um computador
-CREATE OR REPLACE FUNCTION ADD_COMPUTADOR(Nome VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,nomeVendedor VARCHAR,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
+DROP FUNCTION add_computador;      
+CREATE  FUNCTION add_computador(Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,nomeVendedor VARCHAR,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
 RETURNS void
 AS
 $$
 DECLARE
+    id_produto INTEGER;
     BEGIN
-        INSERT INTO produtos (nome, descricao, preco, stock, vendedor_id) VALUES (Nome, Descricao, Preco, Stock,ID_VENDEDOR(nomeVendedor));
-        INSERT INTO computadores (processador, ram, rom, grafica, produto_id) VALUES (Processador, Ram, Rom, Grafica, ID_PRODUTO(Nome,ID_VENDEDOR(nomeVendedor)));
+        id_produto := max_id() +1;
+        INSERT INTO produtos (nome,id, descricao, preco, stock, versao,vendedor_id) VALUES (Nomepc,id_produto, Descricao, Preco, Stock,Versao,ID_VENDEDOR(nomeVendedor));
+        INSERT INTO computadores (processador, ram, rom, grafica, produto_id) VALUES (Processador, Ram, Rom, Grafica, id_produto);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -113,12 +151,12 @@ SELECT ADD_VENDEDOR('techmania', 'password06', 'TechMania',624786152);
 
 
 
--- -- Produtos =========================================================================
+-- Produtos =========================================================================
 
 -- -- Computadores
-SELECT ADD_COMPUTADOR('Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,'techmania','Intel i7 12700k', 16, 1024, 'RTX 3060');
-SELECT ADD_COMPUTADOR('Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,'infortech','Intel i7 12700k', 16, 1024, 'RTX 3060');
-SELECT ADD_COMPUTADOR('Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000, 1,'infortech','Ryzen9 5900x', 32, 1024, 'RTX 3090');
+SELECT add_computador(1,'Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,'techmania','Intel i7 12700k', 16, 1024, 'RTX 3060');
+SELECT add_computador(1,'Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,'infortech','Intel i7 12700k', 16, 1024, 'RTX 3060');
+SELECT add_computador(1,'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000, 1,'infortech','Ryzen9 5900x', 32, 1024, 'RTX 3090');
 
 -- Telemoveis
 
