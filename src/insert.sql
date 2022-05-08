@@ -1,17 +1,56 @@
 -- FUNCOES ==========================================================================
 
 --TODO: FAZER PROTECOES PARA VER SE ESSE PRODUTO AO INSERIR JA EXISTE!!!!
+--retorna tipo de user se existir
+DROP FUNCTION LOGIN_VERIFY;
+CREATE OR REPLACE FUNCTION LOGIN_VERIFY(US VARCHAR,pass VARCHAR)
+RETURNS VARCHAR
+AS
+$$
+DECLARE
+    tipo VARCHAR;
+    idd INT := -1;
+    cond INT := 0;
+BEGIN 
+    SELECT u.id INTO idd FROM utilizadores u, compradores c WHERE u.id = c.utilizador_id AND u.username = US and u.password like pass;
+    IF idd > 0  THEN
+        tipo := 'compradores';
+        cond:=1;
+    END IF;
+    IF cond = 0  THEN
+        SELECT u.id INTO idd FROM utilizadores u, vendedores v WHERE u.id = v.utilizador_id AND  u.username = US and u.password like pass ;
+        IF  idd > 0  THEN
+            tipo := 'vendedores';
+            cond:=1;
+        END IF;
+    END IF;
+    IF cond = 0  THEN
+        SELECT u.id INTO idd FROM utilizadores u, admins a WHERE  u.id = a.utilizador_id AND u.username = US and u.password like pass ;
+        IF  idd > 0  THEN
+            tipo:= 'admins';
+            cond:=1;
+        END IF;
+    END IF;
+    IF cond = 0 THEN 
+        tipo:= 'ERRO';
+    END IF;
+
+    RETURN tipo;
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 -- Devolve o id do user dando o seu username
-CREATE OR REPLACE FUNCTION ID_USER(UN VARCHAR)
+CREATE OR REPLACE FUINTO idNCTION ID_USER(UN VARCHAR)
 RETURNS INT
 AS
 $$
 DECLARE
-    id INT;
-BEGIN
-    SELECT utilizadores.id INTO id FROM utilizadores
-    WHERE utilizadores.username = UN;
+    id INT := -1;
+BEGIN 
+    SELECT u.id  FROM utilizadores u
+    WHERE u.username = UN;
     RETURN id;
 END;
 $$ LANGUAGE plpgsql;

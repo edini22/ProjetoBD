@@ -1,8 +1,16 @@
+from attr import define
+from flask import Flask, request, jsonify
+from re import A
+import datetime
+from email import utils
+from functools import wraps
 import flask
+import jwt
 import psycopg2
 import logging
 
 app = flask.Flask(__name__)
+# imports
 
 StatusCodes = {
     'success': 200,
@@ -11,10 +19,10 @@ StatusCodes = {
 }
 
 # Acesso a DataBase
-#DEBUG: comprador pode fazer varios ratings!!
-#rating pode ser uma chave fraca 
-#produtos, retirar a tabela do historico e colocar um atributo de versao!, retirar o id de unique!!
-#alguns autoincremnete, é melhor retirar !!
+# DEBUG: comprador pode fazer varios ratings!!
+# rating pode ser uma chave fraca
+# produtos, retirar a tabela do historico e colocar um atributo de versao!, retirar o id de unique!!
+# alguns autoincremnete, é melhor retirar !!
 
 
 def db_connection():
@@ -50,16 +58,104 @@ def landing_page():
 # FIXME: verificar os endpoints onde esta dbproj
 
 
+def generate_token(user_id, type_user):
+
+    payload = {
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+        'sub': str(user_id)+';'+str(type_user)
+    }
+
+    return jwt.encode(payload, "SECRET_KEY", algorithm='HS256')
+
+
+def verify_token(f):#TODO: CORRIGIR ESTA PARTE QUE SO COPIEI DE UM TROPA MEU!!
+    @wraps(f)
+    def decorator(args, **kwargs):
+
+        token = None
+        if 'Token' not in request.headers or not request.headers['Token']:
+            return jsonify({'status': StatusCodes['api_error'], 'errors': 'token is missing'})
+
+        token = request.headers['Token']
+
+        try:
+            payload = jwt.decode(
+                token,
+                "SECRET_KEY",
+                algorithms=['HS256']
+            )
+            sub = payload['sub']
+            array = sub.split(";")
+
+        except jwt.ExpiredSignatureError:
+            type_user = ""
+            return jsonify({'status': StatusCodes['api_error'], 'errors': 'token expired'})
+
+        except jwt.InvalidTokenError:
+            type_user = ""
+            return jsonify({'status': StatusCodes['api_error'], 'errors': 'invalid token'})
+
+        return f(array[0], array[1], args, **kwargs)
+
+    return decorator
+
+
 @app.route('/user/', methods=['POST'])
 def new_user():
     # TODO:
     pass
 
-
+# http://localhost:8080/user/
 @app.route('/user/', methods=['PUT'])
-def login():
-    # TODO:
-    pass
+def signIn():
+    """Login do utilizador"""
+    logger.info('PUT /user/')
+    payload = flask.request.get_json()
+
+    conn = db_connection()
+    cur = conn.cursor()
+    
+
+
+    logger.debug(f'PUT /user/ - payload: {payload}')
+
+    if 'username' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'username is required to update'}
+        return flask.jsonify(response)
+    if 'password' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'password is required to update'}
+        return flask.jsonify(response)
+
+     # parameterized queries, good for security and performance
+    statement = 'SELECT LOGIN_VERIFY(%s,%s);'
+    values = (payload['username'], payload['password'])
+
+    try:
+        res = cur.execute(statement, values)
+        row = cur.fetchall()
+        if row[0][0] == "ERRO":
+            response = {'status': StatusCodes['api_error'],
+                        'results': f'username errado ou password incorreta!{row[0][0]}'}
+            conn.rollback()
+        else:
+            token = generate_token(payload['username'], str(row[0][0]))
+            conn.commit()
+            return flask.jsonify({'authToken': token})
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logger.error(error)
+        response = {
+            'status': StatusCodes['internal_error'], 'errors': str(error)}
+
+        # an error occurred, rollback
+        conn.rollback()
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
 
 
 # GET's ==========================================================================
@@ -169,7 +265,7 @@ def get_all_buyers():
 
 @app.route('/vendedores/', methods=['GET'])
 def get_all_sellers():
-    logger.info('GET /compradores')
+    logger.info('GET /vendedores')
     conn = db_connection()
     cur = conn.cursor()
 
@@ -208,6 +304,8 @@ def new_product():
     pass
 
 # http://localhost:8080/product/{produto_id}
+
+
 @app.route('/produto/<produto_id>', methods=['PUT'])
 def change_product(id_produto):
     # TODO:
@@ -215,7 +313,9 @@ def change_product(id_produto):
 
 # Compra =========================================================================
 
-#http://localhost:8080/order
+# http://localhost:8080/order
+
+
 @app.route('/compra/', methods=['POST'])
 def order():
     # TODO:
@@ -223,8 +323,10 @@ def order():
 
 # Rating =========================================================================
 
-#http://localhost:8080/rating/{produto_id}
-@app.route('/ratings/<produto_id>',methods=['POST'])
+# http://localhost:8080/rating/{produto_id}
+
+
+@app.route('/ratings/<produto_id>', methods=['POST'])
 def rating(produto_id):
     # TODO:
     pass
@@ -234,14 +336,17 @@ def rating(produto_id):
 # http://localhost:8080/questions/{produto_id}
 # http://localhost:8080/questions/{produto_id}/{comentario_pai_id}
 
-@app.route('/comentario_normal/<produto_id>',methods=['POST'])
+
+@app.route('/comentario_normal/<produto_id>', methods=['POST'])
 def comment(produto_id):
     # TODO:
     pass
 
 
-
 if __name__ == '__main__':
+    db = db_connection()
+    db.set_session(autocommit=False)
+    db.close()
 
     # set up logging
     logging.basicConfig(filename='log_file.log')
