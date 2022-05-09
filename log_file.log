@@ -707,3 +707,285 @@ WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 173-401-754
 INFO:logger:API v1.1 online: http://127.0.0.1:8080
 INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [08/May/2022 20:42:17] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 14:19:50] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:21:16] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:21:43] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 15:21:43] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:21:43] "[35m[1mNone /user/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:21:58] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 15:21:58] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:21:58] "[35m[1mNone /user/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:22:03] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:25:44] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 15:25:44] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:25:44] "[35m[1mNone /user/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:29:00] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 15:29:00] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:29:00] "[35m[1mNone /user/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:29:04] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:29:45] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 15:33:30] "[35m[1mPOST /user/ HTTP/1.1[0m" 500 -
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 20:58:35] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:01:41] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edieni', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:02:22] "PUT /user/ HTTP/1.1" 200 -
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:02:32] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:37:58] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:38:40] "[35m[1mGET /produtos/ HTTP/1.1[0m" 500 -
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:43:02] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:43:02] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:43:02] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:43:32] "PUT /user/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:43:54] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:43:54] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:43:54] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:44:51] "[35m[1mGET /produtos/ HTTP/1.1[0m" 500 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:44:51] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:44:51] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:45:35] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:45:35] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:45:35] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:50:05] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:50:05] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:50:05] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:50:43] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:50:43] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:50:43] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:52:19] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:52:19] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:52:19] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:52:39] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:52:39] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:52:39] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:logger:API v1.1 online: http://127.0.0.1:8080
+INFO:werkzeug: * Running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:53:01] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:53:01] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:53:01] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:53:29] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:53:29] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:53:29] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:55:53] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:55:53] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:55:53] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:56:21] "[33mPUT /users/ HTTP/1.1[0m" 404 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:56:21] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:56:21] "[35m[1mNone /users/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:logger:PUT /user/
+DEBUG:logger:PUT /user/ - payload: {'username': 'edini', 'password': 'password01'}
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:56:24] "PUT /user/ HTTP/1.1" 200 -
+INFO:logger:GET /produtos
+DEBUG:logger:GET /produtos - parse
+DEBUG:logger:(1, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 6)
+DEBUG:logger:(2, 'Computador1', 'Intel i7 16GB RTX 3060', 1300.0, 3, 1, 5)
+DEBUG:logger:(3, 'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000.0, 1, 1, 5)
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:56:42] "GET /produtos/ HTTP/1.1" 200 -
+ERROR:werkzeug:127.0.0.1 - - [09/May/2022 21:56:42] code 400, message Bad request syntax ('{')
+INFO:werkzeug:127.0.0.1 - - [09/May/2022 21:56:42] "[35m[1mNone /produtos/ HTTP/0.9[0m" HTTPStatus.BAD_REQUEST -
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754
+INFO:werkzeug: * Detected change in 'c:\\Users\\Eduardo22\\Desktop\\FC\\2-ano\\2-Semestre\\BD\\ProjetoBD\\src\\loja.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 173-401-754

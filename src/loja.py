@@ -18,6 +18,8 @@ StatusCodes = {
     'internal_error': 500
 }
 
+global f
+
 # Acesso a DataBase
 # DEBUG: comprador pode fazer varios ratings!!
 # rating pode ser uma chave fraca
@@ -47,8 +49,8 @@ def landing_page():
     Bem vindo à loja DataStore!
     Comece as suas compras assim que possível :)
     
-    Para se registar use o Endpoint http://localhost:8080/dbproj/user (POST)
-    Para se autenticar use o Endpoint http://localhost:8080/dbproj/user (PUT)
+    Para se registar use o Endpoint http://localhost:8080/user/ (POST)
+    Para se autenticar use o Endpoint http://localhost:8080/user/ (PUT)
     
     Fábio Santos 2020212310
     Eduardo Figueiredo 2020213717
@@ -68,15 +70,15 @@ def generate_token(user_id, type_user):
     return jwt.encode(payload, "SECRET_KEY", algorithm='HS256')
 
 
-def verify_token(f):#TODO: CORRIGIR ESTA PARTE QUE SO COPIEI DE UM TROPA MEU!!
+def verify_token(f):  # TODO: CORRIGIR ESTA PARTE QUE SO COPIEI DE UM TROPA MEU!!
     @wraps(f)
-    def decorator(args, **kwargs):
+    def decorator():
 
         token = None
-        if 'Token' not in request.headers or not request.headers['Token']:
+        if 'Authorization' not in request.headers or not request.headers['Authorization']:
             return jsonify({'status': StatusCodes['api_error'], 'errors': 'token is missing'})
 
-        token = request.headers['Token']
+        token = request.headers['Authorization'].split(" ")[1]
 
         try:
             payload = jwt.decode(
@@ -95,15 +97,10 @@ def verify_token(f):#TODO: CORRIGIR ESTA PARTE QUE SO COPIEI DE UM TROPA MEU!!
             type_user = ""
             return jsonify({'status': StatusCodes['api_error'], 'errors': 'invalid token'})
 
-        return f(array[0], array[1], args, **kwargs)
+        return f(array[0], array[1])
 
     return decorator
 
-
-@app.route('/user/', methods=['POST'])
-def new_user():
-    # TODO:
-    pass
 
 # http://localhost:8080/user/
 @app.route('/user/', methods=['PUT'])
@@ -114,8 +111,6 @@ def signIn():
 
     conn = db_connection()
     cur = conn.cursor()
-    
-
 
     logger.debug(f'PUT /user/ - payload: {payload}')
 
@@ -140,7 +135,10 @@ def signIn():
                         'results': f'username errado ou password incorreta!{row[0][0]}'}
             conn.rollback()
         else:
-            token = generate_token(payload['username'], str(row[0][0]))
+            cur.execute('SELECT ID_USER(%s)', (payload['username'],))
+            rows = cur.fetchall()
+            print(rows[0][0])
+            token = generate_token(str(rows[0][0]), str(row[0][0]))
             conn.commit()
             return flask.jsonify({'authToken': token})
 
@@ -158,12 +156,20 @@ def signIn():
     return flask.jsonify(response)
 
 
+@app.route('/user/', methods=['POST'])
+@verify_token
+def new_user(user_id, tipo):
+    # TODO:
+    pass
+
 # GET's ==========================================================================
 
 # http://localhost:8080/produtos/
 
+
 @app.route('/produtos/', methods=['GET'])
-def get_all_produts():
+@verify_token
+def get_all_produts(user_id, tipo):
     logger.info('GET /produtos')
     conn = db_connection()
     cur = conn.cursor()
@@ -356,7 +362,8 @@ if __name__ == '__main__':
     ch.setLevel(logging.DEBUG)
 
     # create formatter
-    formatter = logging.Formatter('%(asctime)s [%(levelname)s]:  %(message)s', '%H:%M:%S')
+    formatter = logging.Formatter(
+        '%(asctime)s [%(levelname)s]:  %(message)s', '%H:%M:%S')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
