@@ -1,0 +1,32 @@
+{
+    {
+        "username": "edini",
+        "password": "password01"
+    },
+    {
+        "username": "josem",
+        "password": "password03"
+    },
+    {
+        "username": "infortech",
+        "password": "password05"
+    },
+    {
+        "username" :"malaquias",
+        "password" : "tone1234",
+        "nome" : "Ezequiel",
+        "tipo" : "comprador",
+        "morada" : "Rua do cruzeiro,Pereira"
+    },
+    {
+        "tipo" : "computador",
+        "nome": "Portátil Gaming ASUS ROG Strix G17",
+        "descricao": "AMD Ryzen 7 5800H - NVIDIA GeForce RTX 3060 - RAM: 16 GB - 1 TB SSD - 17.3",
+        "preco" : "1999",
+        "stock" : "3",
+        "processador" : "AMD Ryzen 7",
+        "ram" : "16",
+        "rom" : "1000",
+        "grafica" : "NVIDIA GeForce RTX 3060"
+    }
+}

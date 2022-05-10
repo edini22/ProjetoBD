@@ -1,3 +1,4 @@
+from urllib import response
 from attr import define
 from flask import Flask, request, jsonify
 from re import A
@@ -48,10 +49,10 @@ def landing_page():
     return """
     Bem vindo à loja DataStore!
     Comece as suas compras assim que possível :)
-    
+
     Para se registar use o Endpoint http://localhost:8080/user/ (POST)
     Para se autenticar use o Endpoint http://localhost:8080/user/ (PUT)
-    
+
     Fábio Santos 2020212310
     Eduardo Figueiredo 2020213717
     """
@@ -70,7 +71,7 @@ def generate_token(user_id, type_user):
     return jwt.encode(payload, "SECRET_KEY", algorithm='HS256')
 
 
-def verify_token(f):  # TODO: CORRIGIR ESTA PARTE QUE SO COPIEI DE UM TROPA MEU!!
+def verify_token(f):
     @wraps(f)
     def decorator():
 
@@ -155,12 +156,97 @@ def signIn():
 
     return flask.jsonify(response)
 
+# http://localhost:8080/user/
+
 
 @app.route('/user/', methods=['POST'])
 @verify_token
-def new_user(user_id, tipo):
-    # TODO:
-    pass
+def new_user(user_id, type_user):
+    logger.info('POST /user')
+    payload = flask.request.get_json()
+
+    if(type_user == "comprador"):
+        reponse = {'Status': StatusCodes['internal_error'],
+                   'error': "compradores nao têm este acesso!"}
+        return jsonify(response)
+
+    if 'username' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'username is required to update'}
+        return flask.jsonify(response)
+    if 'password' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'password is required to update'}
+        return flask.jsonify(response)
+
+    if 'nome' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'nome is required to update'}
+        return flask.jsonify(response)
+
+    if 'tipo' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'tipo is required to update'}
+        return flask.jsonify(response)
+
+    if(payload['tipo'] == "comprador"):
+        if 'morada' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'morada is required to update'}
+            return flask.jsonify(response)
+    elif(payload['tipo'] == "vendedor"):
+        if 'nif' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'nif is required to update'}
+            return flask.jsonify(response)
+    elif(payload['tipo'] == "admin"):
+        pass
+    else:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'tipo incorreto(admin/comprador/utilizador)'}
+        return flask.jsonify(response)
+
+    if ((payload['tipo'] == "admin" or payload['tipo'] == "vendedor") and type_user == "vendedor"):
+        reponse = {'Status': StatusCodes['internal_error'],
+                   'error': 'vendedores nao têm este acesso!'}
+        return flask.jsonify(response)
+
+    addAdmin = 'SELECT ADD_ADMIN(%s,%s,%s);'
+    addcomp = 'SELECT ADD_COMPRADOR(%s,%s,%s,%s);'
+    addvend = 'SELECT ADD_VENDEDOR(%s,%s,%s,%d);'
+
+    conn = db_connection()
+    cur = conn.cursor()
+    try:
+        if(payload['tipo'] == "admin"):
+            valuesadmin = (payload['username'],
+                           payload['password'], payload['nome'])
+            cur.execute(addAdmin, valuesadmin)
+        elif(payload['tipo'] == "comprador"):
+            valuescomp = (payload['username'], payload['password'],
+                          payload['nome'], payload['morada'])
+            cur.execute(addcomp, valuescomp)
+        else:
+            valuesvend = (payload['username'], payload['password'],
+                          payload['nome'], int(payload['nif']))
+            cur.execute(addvend, valuesvend)
+        tipo = payload['tipo']
+        reponse = {'Status': StatusCodes['success'],
+                   'Results': f'{tipo} inserido!'}
+
+        conn.commit()
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /produtos - error: {error}')
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(reponse)
 
 # GET's ==========================================================================
 
@@ -168,8 +254,7 @@ def new_user(user_id, tipo):
 
 
 @app.route('/produtos/', methods=['GET'])
-@verify_token
-def get_all_produts(user_id, tipo):
+def get_all_produts():
     logger.info('GET /produtos')
     conn = db_connection()
     cur = conn.cursor()
@@ -183,7 +268,7 @@ def get_all_produts(user_id, tipo):
         for row in rows:
             logger.debug(row)
             content = {'ID': int(row[0]), 'Nome': row[1], 'Descricao': row[2], 'Preco': int(
-                row[3]), 'Stock': int(row[4]), 'ID Vendedor': int(row[5])}
+                row[3]), 'Stock': int(row[4]), 'Versao': int(row[5]),'ID Vendedor': int(row[6])}
             Results.append(content)
 
         reponse = {'Status': StatusCodes['success'], 'Results': Results}
@@ -203,12 +288,20 @@ def get_all_produts(user_id, tipo):
 # http://localhost:8080/utilizadores/
 
 @app.route('/utilizadores/', methods=['GET'])
-def get_all_users():
+@verify_token
+def get_all_users(user_id, type_user):
     logger.info('GET /utilizadores')
+
+    if(type_user == "comprador"):
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
+        return jsonify(response)
+
     conn = db_connection()
     cur = conn.cursor()
 
     try:
+
         cur.execute('SELECT nome, id, username  FROM utilizadores')
         rows = cur.fetchall()
 
@@ -236,12 +329,20 @@ def get_all_users():
 # http://localhost:8080/compradores/
 
 @app.route('/compradores/', methods=['GET'])
-def get_all_buyers():
+@verify_token
+def get_all_buyers(user_id, type_user):
     logger.info('GET /compradores')
+
+    if(type_user == "comprador"):
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
+        return jsonify(response)
+
     conn = db_connection()
     cur = conn.cursor()
 
     try:
+
         cur.execute('SELECT utilizadores.nome, utilizadores.id, utilizadores.username, compradores.morada FROM utilizadores, compradores WHERE utilizadores.id = compradores.utilizador_id')
         rows = cur.fetchall()
 
@@ -270,12 +371,25 @@ def get_all_buyers():
 # http://localhost:8080/vendedores/
 
 @app.route('/vendedores/', methods=['GET'])
-def get_all_sellers():
+@verify_token
+def get_all_sellers(user_id, type_user):
     logger.info('GET /vendedores')
+
+    if(type_user == "comprador"):
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
+        return jsonify(response)
+
+    if(type_user == "vendedor"):
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "vendedorres nao têm este acesso!"}
+        return jsonify(response)
+
     conn = db_connection()
     cur = conn.cursor()
 
     try:
+
         cur.execute('SELECT utilizadores.nome, utilizadores.id, utilizadores.username, vendedores.nif FROM utilizadores, vendedores WHERE utilizadores.id = vendedores.utilizador_id')
         rows = cur.fetchall()
 
@@ -303,16 +417,137 @@ def get_all_sellers():
 
 # Produtos =======================================================================
 
-# http://localhost:8080/product
+# http://localhost:8080/produto/
 @app.route('/produto/', methods=['POST'])
-def new_product():
-    # TODO:
-    pass
+@verify_token
+def new_product(user_id, type_user):
+    logger.info('POST /produto')
+    payload = flask.request.get_json()
+
+    if(type_user != "vendedor"):
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Apenas Vendedores podem adicionar produtos!"}
+        return jsonify(reponse)
+
+    if 'nome' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'nome is required to update'}
+        return flask.jsonify(response)
+
+    if 'descricao' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'descricao is required to update'}
+        return flask.jsonify(response)
+
+    if 'preco' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'preco is required to update'}
+        return flask.jsonify(response)
+
+    if 'stock' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'stock is required to update'}
+        return flask.jsonify(response)
+
+    if 'tipo' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'tipo is required to update'}
+        return flask.jsonify(response)
+
+
+    if(payload['tipo'] == "computador"):
+        if 'processador' not in payload:
+            response = {'status': StatusCodes['api_error'],
+                        'results': 'processador is required to update'}
+            return flask.jsonify(response)
+        if 'ram' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'ram is required to update'}
+            return flask.jsonify(response)
+        if 'rom' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'rom is required to update'}
+            return flask.jsonify(response)
+
+        if 'grafica' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'grafica is required to update'}
+            return flask.jsonify(response)
+
+
+    elif(payload['tipo'] == "telemovel"):
+        if 'tamanho' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'tamanho is required to update'}
+            return flask.jsonify(response)
+
+        if 'ram' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'ram is required to update'}
+            return flask.jsonify(response)
+        if 'rom' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'rom is required to update'}
+            return flask.jsonify(response)
+
+    elif(payload['tipo'] == "televisao"):
+        if 'tamanho' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'tamanho is required to update'}
+            return flask.jsonify(response)
+
+        if 'resolucao' not in payload:
+            response = {
+                'status': StatusCodes['api_error'], 'results': 'resolucao is required to update'}
+            return flask.jsonify(response)
+
+
+    else:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'tipo incorreto(computador/telemovel/televisao)'}
+        return flask.jsonify(response)
+
+
+
+    conn = db_connection()
+    cur = conn.cursor()
+    try:
+        if(payload['tipo'] == "computador"):
+            add = 'SELECT add_computador(1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
+            values = (payload['nome'],payload['descricao'], float(payload['preco']),int(payload['stock']),int(user_id),payload['processador'],int(payload['ram']),int(payload['rom']),payload['grafica'])
+            cur.execute(add, values)
+        elif(payload['tipo'] == "telemovel"):
+            add = 'SELECT add_telemovel(1,%s,%s,%s,%s,%s,%s,%s,%s);'
+            values = (payload['nome'],payload['descricao'], float(payload['preco']),int(payload['stock']),int(user_id),float(payload['tamanho']),int(payload['ram']),int(payload['rom']))
+            cur.execute(add, values)
+        else:
+            add = 'SELECT add_televisao(1,%s,%s,%s,%s,%s,%s,%s);'
+            values = (payload['nome'],payload['descricao'], float(payload['preco']),int(payload['stock']),int(user_id),float(payload['tamanho']),payload['resolucao'])
+            cur.execute(add, values)
+        tipo = payload['tipo']
+        reponse = {'Status': StatusCodes['success'],
+                   'Results': f'{tipo} inserido!'}
+
+        conn.commit()
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'GET /produtos - error: {error}')
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(reponse)
+
 
 # http://localhost:8080/product/{produto_id}
 
 
 @app.route('/produto/<produto_id>', methods=['PUT'])
+@verify_token
 def change_product(id_produto):
     # TODO:
     pass

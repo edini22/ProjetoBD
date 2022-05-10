@@ -14,20 +14,20 @@ DECLARE
 BEGIN 
     SELECT u.id INTO idd FROM utilizadores u, compradores c WHERE u.id = c.utilizador_id AND u.username = US and u.password like pass;
     IF idd > 0  THEN
-        tipo := 'compradores';
+        tipo := 'comprador';
         cond:=1;
     END IF;
     IF cond = 0  THEN
         SELECT u.id INTO idd FROM utilizadores u, vendedores v WHERE u.id = v.utilizador_id AND  u.username = US and u.password like pass ;
         IF  idd > 0  THEN
-            tipo := 'vendedores';
+            tipo := 'vendedor';
             cond:=1;
         END IF;
     END IF;
     IF cond = 0  THEN
         SELECT u.id INTO idd FROM utilizadores u, admins a WHERE  u.id = a.utilizador_id AND u.username = US and u.password like pass ;
         IF  idd > 0  THEN
-            tipo:= 'admins';
+            tipo:= 'admin';
             cond:=1;
         END IF;
     END IF;
@@ -42,20 +42,22 @@ $$ LANGUAGE plpgsql;
 
 
 -- Devolve o id do user dando o seu username
+DROP FUNCTION ID_USER;
 CREATE OR REPLACE FUNCTION ID_USER(UN VARCHAR)
 RETURNS INT
 AS
 $$
 DECLARE
-    id INT := -1;
+    idd INT := -1;
 BEGIN 
-    SELECT u.id  FROM utilizadores u
+    SELECT u.id into idd  FROM utilizadores u
     WHERE u.username = UN;
-    RETURN id;
+    RETURN idd;
 END;
 $$ LANGUAGE plpgsql;
 
 -- insere um comprador
+DROP FUNCTION ADD_COMPRADOR;
 CREATE OR REPLACE FUNCTION ADD_COMPRADOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Morada VARCHAR)
 RETURNS void
 AS
@@ -68,11 +70,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um admin
+
+DROP FUNCTION ADD_ADMIN;
 CREATE OR REPLACE FUNCTION ADD_ADMIN(userName VARCHAR,pass VARCHAR,Nome VARCHAR)
 RETURNS void
 AS
 $$
 DECLARE
+id INT;
     BEGIN
         INSERT INTO utilizadores (username, password, nome) VALUES (userName, pass, Nome);
         INSERT INTO admins (utilizador_id) VALUES (ID_USER(userName));
@@ -80,6 +85,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Devolve o id do vendedor dando o seu username
+DROP FUNCTION ID_VENDEDOR;
 CREATE OR REPLACE FUNCTION ID_VENDEDOR(UN VARCHAR)
 RETURNS INT
 AS
@@ -94,6 +100,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um vendedor
+DROP FUNCTION ADD_VENDEDOR;
 CREATE OR REPLACE FUNCTION ADD_VENDEDOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Nif INTEGER)
 RETURNS void
 AS
@@ -104,6 +111,8 @@ DECLARE
         INSERT INTO vendedores (utilizador_id,nif) VALUES (ID_USER(userName),Nif);
 END;
 $$ LANGUAGE plpgsql;
+
+
 
 --TODO: --Devolve maxima versao  da tabela produtos
 -- CREATE OR REPLACE FUNCTION max_versao(string VARCHAR, vendedor INT)
@@ -158,7 +167,7 @@ $$ LANGUAGE plpgsql;
 
 -- insere um computador
 DROP FUNCTION add_computador;      
-CREATE  FUNCTION add_computador(Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,nomeVendedor VARCHAR,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
+CREATE  FUNCTION add_computador(Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
 RETURNS void
 AS
 $$
@@ -166,8 +175,36 @@ DECLARE
     id_produto INTEGER;
     BEGIN
         id_produto := max_id() +1;
-        INSERT INTO produtos (nome,id, descricao, preco, stock, versao,vendedor_id) VALUES (Nomepc,id_produto, Descricao, Preco, Stock,Versao,ID_VENDEDOR(nomeVendedor));
+        INSERT INTO produtos (nome,id, descricao, preco, stock, versao,vendedor_id) VALUES (Nomepc,id_produto, Descricao, Preco, Stock,Versao,ID_VEND);
         INSERT INTO computadores (processador, ram, rom, grafica, produto_id) VALUES (Processador, Ram, Rom, Grafica, id_produto);
+END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION add_telemovel; 
+CREATE  FUNCTION add_telemovel(Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Ram INTEGER,Rom INTEGER)
+RETURNS void
+AS
+$$
+DECLARE
+    id_produto INTEGER;
+    BEGIN
+        id_produto := max_id() +1;
+        INSERT INTO produtos (nome,id, descricao, preco, stock, versao,vendedor_id) VALUES (Nomepc,id_produto, Descricao, Preco, Stock,Versao,ID_VEND);
+        INSERT INTO telemoveis (tamanho, ram, rom, produto_id) VALUES (Tamanho, Ram, Rom, id_produto);
+END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION add_televisao; 
+CREATE  FUNCTION add_televisao(Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Resolucao INTEGER)
+RETURNS void
+AS
+$$
+DECLARE
+    id_produto INTEGER;
+    BEGIN
+        id_produto := max_id() +1;
+        INSERT INTO produtos (nome,id, descricao, preco, stock, versao,vendedor_id) VALUES (Nomepc,id_produto, Descricao, Preco, Stock,Versao,ID_VEND);
+        INSERT INTO telemoveis (tamanho, resolucao, produto_id) VALUES (Tamanho, Resolucao, id_produto);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -193,9 +230,9 @@ SELECT ADD_VENDEDOR('techmania', 'password06', 'TechMania',624786152);
 -- Produtos =========================================================================
 
 -- -- Computadores
-SELECT add_computador(1,'Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,'techmania','Intel i7 12700k', 16, 1024, 'RTX 3060');
-SELECT add_computador(1,'Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,'infortech','Intel i7 12700k', 16, 1024, 'RTX 3060');
-SELECT add_computador(1,'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000, 1,'infortech','Ryzen9 5900x', 32, 1024, 'RTX 3090');
+SELECT add_computador(1,'Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,6,'Intel i7 12700k', 16, 1024, 'RTX 3060');
+SELECT add_computador(1,'Computador1', 'Intel i7 16GB RTX 3060', 1300, 3,5,'Intel i7 12700k', 16, 1024, 'RTX 3060');
+SELECT add_computador(1,'Computador2', 'Ryzen9 5900x 32GB RTX 3090', 4000, 1,5,'Ryzen9 5900x', 32, 1024, 'RTX 3090');
 
 -- Telemoveis
 
