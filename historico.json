@@ -1,4 +1,4 @@
-{
+[
     {
         "username": "edini",
         "password": "password01"
@@ -15,7 +15,7 @@
         "username" :"malaquias",
         "password" : "tone1234",
         "nome" : "Ezequiel",
-        "tipo" : "comprador",
+        "tipo" : "vendedor",
         "morada" : "Rua do cruzeiro,Pereira"
     },
     {
@@ -28,5 +28,17 @@
         "ram" : "16",
         "rom" : "1000",
         "grafica" : "NVIDIA GeForce RTX 3060"
+    },
+    {
+        "cart": [
+            {
+                "product_id": "1",
+                "quantidade" : "1"
+    
+            },{
+                "product_id": "2",
+                "quantidade" : "1"
+            }
+        ]
     }
-}
+]

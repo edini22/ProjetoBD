@@ -58,7 +58,6 @@ def landing_page():
     """
 
 # LOGIN ==========================================================================
-# FIXME: verificar os endpoints onde esta dbproj
 
 
 def generate_token(user_id, type_user):
@@ -73,7 +72,7 @@ def generate_token(user_id, type_user):
 
 def verify_token(f):
     @wraps(f)
-    def decorator():
+    def decorator(*args,**kwargs):
 
         token = None
         if 'Authorization' not in request.headers or not request.headers['Authorization']:
@@ -98,7 +97,41 @@ def verify_token(f):
             type_user = ""
             return jsonify({'status': StatusCodes['api_error'], 'errors': 'invalid token'})
 
-        return f(array[0], array[1])
+        return f(array[0], array[1],*args,**kwargs)
+
+    return decorator
+
+
+def verify_token_login(f):
+    @wraps(f)
+    def decorator():
+        array = []
+        token = None
+        if 'Authorization' not in request.headers or not request.headers['Authorization']:
+            array.append("logout")
+        else:
+
+            token = request.headers['Authorization'].split(" ")[1]
+
+            try:
+                payload = jwt.decode(
+                    token,
+                    "SECRET_KEY",
+                    algorithms=['HS256']
+                )
+                sub = payload['sub']
+                aux = sub.split(";")
+                array.append(aux[1])
+
+            except jwt.ExpiredSignatureError:
+                type_user = ""
+                return jsonify({'status': StatusCodes['api_error'], 'errors': 'token expired'})
+
+            except jwt.InvalidTokenError:
+                type_user = ""
+                return jsonify({'status': StatusCodes['api_error'], 'errors': 'invalid token'})
+
+        return f(array[0])
 
     return decorator
 
@@ -157,23 +190,20 @@ def signIn():
     return flask.jsonify(response)
 
 # http://localhost:8080/user/
-
-
+# qualquer um pode se registar como comprador
+# apenas admins adicionam admins e vendedores
 @app.route('/user/', methods=['POST'])
-@verify_token
-def new_user(user_id, type_user):
+@verify_token_login
+def new_user(type_user):
     logger.info('POST /user')
     payload = flask.request.get_json()
 
-    if(type_user == "comprador"):
-        reponse = {'Status': StatusCodes['internal_error'],
-                   'error': "compradores nao têm este acesso!"}
-        return jsonify(response)
-
+    # Verificar todos os parametros para adicionar user
     if 'username' not in payload:
         response = {'status': StatusCodes['api_error'],
                     'results': 'username is required to update'}
         return flask.jsonify(response)
+
     if 'password' not in payload:
         response = {'status': StatusCodes['api_error'],
                     'results': 'password is required to update'}
@@ -189,18 +219,24 @@ def new_user(user_id, type_user):
                     'results': 'tipo is required to update'}
         return flask.jsonify(response)
 
+    # Verificar as permissoes para adicionar tipos de users
     if(payload['tipo'] == "comprador"):
         if 'morada' not in payload:
             response = {
                 'status': StatusCodes['api_error'], 'results': 'morada is required to update'}
             return flask.jsonify(response)
+
     elif(payload['tipo'] == "vendedor"):
+        if(type_user != "admin"):
+            return jsonify({'status': StatusCodes['api_error'], 'errors': 'wrong user type'})
         if 'nif' not in payload:
             response = {
                 'status': StatusCodes['api_error'], 'results': 'nif is required to update'}
             return flask.jsonify(response)
+
     elif(payload['tipo'] == "admin"):
-        pass
+        if(type_user != "admin"):
+            return jsonify({'status': StatusCodes['api_error'], 'errors': 'wrong user type'})
     else:
         response = {'status': StatusCodes['api_error'],
                     'results': 'tipo incorreto(admin/comprador/utilizador)'}
@@ -237,7 +273,7 @@ def new_user(user_id, type_user):
         conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
-        logger.error(f'GET /produtos - error: {error}')
+        logger.error(f'POST /user - error: {error}')
         reponse = {
             'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
@@ -268,7 +304,7 @@ def get_all_produts():
         for row in rows:
             logger.debug(row)
             content = {'ID': int(row[0]), 'Nome': row[1], 'Descricao': row[2], 'Preco': int(
-                row[3]), 'Stock': int(row[4]), 'Versao': int(row[5]),'ID Vendedor': int(row[6])}
+                row[3]), 'Stock': int(row[4]), 'Versao': int(row[5]), 'ID Vendedor': int(row[6])}
             Results.append(content)
 
         reponse = {'Status': StatusCodes['success'], 'Results': Results}
@@ -292,6 +328,7 @@ def get_all_produts():
 def get_all_users(user_id, type_user):
     logger.info('GET /utilizadores')
 
+    # Verficar permissoes
     if(type_user == "comprador"):
         reponse = {
             'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
@@ -333,6 +370,7 @@ def get_all_users(user_id, type_user):
 def get_all_buyers(user_id, type_user):
     logger.info('GET /compradores')
 
+    # Verficar permissoes
     if(type_user == "comprador"):
         reponse = {
             'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
@@ -343,7 +381,8 @@ def get_all_buyers(user_id, type_user):
 
     try:
 
-        cur.execute('SELECT utilizadores.nome, utilizadores.id, utilizadores.username, compradores.morada FROM utilizadores, compradores WHERE utilizadores.id = compradores.utilizador_id')
+        cur.execute(
+            'SELECT u.nome, u.id, u.username, c.morada FROM utilizadores u, compradores c WHERE u.id = c.utilizador_id')
         rows = cur.fetchall()
 
         logger.debug('GET /compradores - parse')
@@ -375,6 +414,7 @@ def get_all_buyers(user_id, type_user):
 def get_all_sellers(user_id, type_user):
     logger.info('GET /vendedores')
 
+    # Verficar permissoes
     if(type_user == "comprador"):
         reponse = {
             'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
@@ -390,7 +430,8 @@ def get_all_sellers(user_id, type_user):
 
     try:
 
-        cur.execute('SELECT utilizadores.nome, utilizadores.id, utilizadores.username, vendedores.nif FROM utilizadores, vendedores WHERE utilizadores.id = vendedores.utilizador_id')
+        cur.execute(
+            'SELECT u.nome, u.id, u.username, v.nif FROM utilizadores u, vendedores v WHERE utilizadores.id = v.utilizador_id')
         rows = cur.fetchall()
 
         logger.debug('GET /vendedores - parse')
@@ -424,11 +465,13 @@ def new_product(user_id, type_user):
     logger.info('POST /produto')
     payload = flask.request.get_json()
 
+    # Verficar permissoes
     if(type_user != "vendedor"):
         reponse = {
             'Status': StatusCodes['internal_error'], 'error': "Apenas Vendedores podem adicionar produtos!"}
         return jsonify(reponse)
 
+    # Verficar dados
     if 'nome' not in payload:
         response = {'status': StatusCodes['api_error'],
                     'results': 'nome is required to update'}
@@ -454,7 +497,6 @@ def new_product(user_id, type_user):
                     'results': 'tipo is required to update'}
         return flask.jsonify(response)
 
-
     if(payload['tipo'] == "computador"):
         if 'processador' not in payload:
             response = {'status': StatusCodes['api_error'],
@@ -473,7 +515,6 @@ def new_product(user_id, type_user):
             response = {
                 'status': StatusCodes['api_error'], 'results': 'grafica is required to update'}
             return flask.jsonify(response)
-
 
     elif(payload['tipo'] == "telemovel"):
         if 'tamanho' not in payload:
@@ -501,28 +542,35 @@ def new_product(user_id, type_user):
                 'status': StatusCodes['api_error'], 'results': 'resolucao is required to update'}
             return flask.jsonify(response)
 
-
     else:
         response = {'status': StatusCodes['api_error'],
                     'results': 'tipo incorreto(computador/telemovel/televisao)'}
         return flask.jsonify(response)
 
-
-
     conn = db_connection()
     cur = conn.cursor()
     try:
+        cur.execute('SELECT max_id();')
+        idd = int(cur.fetchall()[0][0])+1
+        print(idd)
+
         if(payload['tipo'] == "computador"):
-            add = 'SELECT add_computador(1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
-            values = (payload['nome'],payload['descricao'], float(payload['preco']),int(payload['stock']),int(user_id),payload['processador'],int(payload['ram']),int(payload['rom']),payload['grafica'])
+            add = 'SELECT add_computador(%s,1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
+            
+            values = (idd,payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
+                user_id), payload['processador'], int(payload['ram']), int(payload['rom']), payload['grafica'])
             cur.execute(add, values)
+
         elif(payload['tipo'] == "telemovel"):
-            add = 'SELECT add_telemovel(1,%s,%s,%s,%s,%s,%s,%s,%s);'
-            values = (payload['nome'],payload['descricao'], float(payload['preco']),int(payload['stock']),int(user_id),float(payload['tamanho']),int(payload['ram']),int(payload['rom']))
+            add = 'SELECT add_telemovel(%s,1,%s,%s,%s,%s,%s,%s,%s,%s);'
+            values = (idd,payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
+                user_id), float(payload['tamanho']), int(payload['ram']), int(payload['rom']))
             cur.execute(add, values)
+
         else:
-            add = 'SELECT add_televisao(1,%s,%s,%s,%s,%s,%s,%s);'
-            values = (payload['nome'],payload['descricao'], float(payload['preco']),int(payload['stock']),int(user_id),float(payload['tamanho']),payload['resolucao'])
+            add = 'SELECT add_televisao(%s,1,%s,%s,%s,%s,%s,%s,%s);'
+            values = (idd,payload['nome'], payload['descricao'], float(payload['preco']), int(
+                payload['stock']), int(user_id), float(payload['tamanho']), payload['resolucao'])
             cur.execute(add, values)
         tipo = payload['tipo']
         reponse = {'Status': StatusCodes['success'],
@@ -543,14 +591,175 @@ def new_product(user_id, type_user):
     return flask.jsonify(reponse)
 
 
-# http://localhost:8080/product/{produto_id}
+# http://localhost:8080/produto/{produto_id}
 
-
-@app.route('/produto/<produto_id>', methods=['PUT'])
+# TODO: Mudar f strings para proteger de ataques
+@app.route('/produtos/<produto_id>', methods=['PUT'])
 @verify_token
-def change_product(id_produto):
-    # TODO:
-    pass
+def change_product(user_id, type_user,produto_id):
+    logger.info('PUT /poduto/<produto_id>')
+    payload = flask.request.get_json()
+
+    # Verificar permissoes
+    if type_user != "vendedor":
+        response = {'Status': StatusCodes['internal_error'],
+                    'error': "Apenas Vendedores podem alterar produtos."}
+        return jsonify(response)
+
+    # Verificar se algum dos paremetros esta no body da mensagem
+    lista = ['nome', 'descricao', 'preco', 'stock', 'processador', 'ram', 'rom', 'grafica', 'tamanho', 'resolucao']
+    count = 0
+    for i in lista:
+        if i not in payload:
+            count +=1
+    if count == len(lista):
+        response = {'Status': StatusCodes['internal_error'],
+                    'error': "Nenhum parametro correto para atualizar o produto."}
+        return jsonify(response)
+    
+
+    conn = db_connection()
+    cur = conn.cursor()
+    try: 
+        # Verificar se o user é vendedor do produto
+        cur.execute('SELECT vendedor_id FROM produtos WHERE %s = vendedor_id;', user_id)
+        vendedor_id = cur.fetchall()[0][0]
+        if vendedor_id != int(user_id):
+            response = {'Status': StatusCodes['internal_error'],
+                        'error': "Nao tem permissao para alterar este produto."}
+            return jsonify(response)
+
+        # Selecionar os dados da versao anterior do produto
+        cur.execute('SELECT nome FROM produtos WHERE id = %s;', produto_id)
+        nome = cur.fetchall()
+        nome = nome[0][0]
+
+        cur.execute('SELECT descricao FROM produtos WHERE id = %s;', produto_id)
+        descricao = cur.fetchall()
+        descricao = descricao[0][0]
+
+        cur.execute('SELECT preco FROM produtos WHERE id = %s;', produto_id)
+        preco = cur.fetchall()
+        preco = preco[0][0]
+
+        cur.execute('SELECT stock FROM produtos WHERE id = %s;', produto_id)
+        stock = cur.fetchall()
+        stock = stock[0][0]
+
+        cur.execute('SELECT versao FROM produtos WHERE id = %s;', produto_id)
+        versao = cur.fetchall()
+        versao = versao[0][0] + 1  # aumentar a versao em 1 valor
+
+        cur.execute('SELECT GET_TIPO(%s);', produto_id)
+        tipo = cur.fetchall()
+        tipo = tipo[0][0]
+
+        # Atualizar os dados para a nova versao do produto
+        if 'nome' in payload:
+            nome = payload['nome']
+
+        if 'descricao' in payload:
+            nome = payload['descricao']
+
+        if 'preco' in payload:
+            nome = payload['preco']
+
+        if 'stock' in payload:
+            nome = payload['stock']
+
+        if tipo == 'computador':
+            cur.execute('SELECT c.processador FROM computadores c WHERE c.produto_id = %s;', produto_id)
+            processador = cur.fetchall()
+            processador = processador[0][0]
+
+            cur.execute('SELECT c.ram FROM computadores c WHERE c.produto_id = %s;', produto_id)
+            ram = cur.fetchall()
+            ram = ram[0][0]
+
+            cur.execute('SELECT c.rom FROM computadores c WHERE c.produto_id = %s;', produto_id)
+            rom = cur.fetchall()
+            rom = rom[0][0]
+
+            cur.execute('SELECT c.processador FROM computadores c WHERE c.produto_id = %s;', produto_id)
+            grafica = cur.fetchall()
+            grafica = grafica[0][0]
+
+            if 'processador' in payload:
+                processador = payload['processador']
+            
+            if 'ram' in payload:
+                ram = payload['ram']
+
+            if 'rom' in payload:
+                rom = payload['rom']
+
+            if 'grafica' in payload:
+                grafica = payload['grafica']
+            
+            add = 'SELECT add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
+            values = (produto_id, versao, nome, descricao, preco, stock, user_id, processador, ram, rom, grafica)
+            cur.execute(add,values)
+                
+            response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
+
+        elif tipo == 'telemovel':
+            cur.execute('SELECT tamanho FROM telemoveis WHERE id = %s;', produto_id)
+            tamanho = cur.fetchall()
+            tamanho = tamanho[0][0]
+
+            cur.execute('SELECT ram FROM telemoveis WHERE id = %s;', produto_id)
+            ram = cur.fetchall()
+            ram = ram[0][0]
+
+            cur.execute('SELECT rom FROM telemoveis WHERE id = %s;', produto_id)
+            rom = cur.fetchall()
+            rom = rom[0][0]
+
+            if 'tamanho' in payload:
+                tamanho = payload['rom']
+
+            if 'ram' in payload:
+                ram = payload['ram']
+
+            if 'rom' in payload:
+                rom = payload['rom']
+
+            cur.execute('SELECT add_telemovel(%s,%s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                        produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, ram, rom)
+            response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
+
+        elif tipo == 'televisao':
+            cur.execute('SELECT tamanho FROM televisoes WHERE id = %d;', produto_id)
+            tamanho = cur.fetchall()
+            tamanho = tamanho[0][0]
+
+            cur.execute('SELECT resolucao FROM televisoes WHERE id = %d;', produto_id)
+            resolucao = cur.fetchall()
+            resolucao = resolucao[0][0]
+
+            if 'tamanho' in payload:
+                tamanho = payload['rom']
+
+            if 'resolucao' in payload:
+                resolucao = payload['resolucao']
+
+            cur.execute('SELECT add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                        produto_id, nome, descricao, preco, stock, user_id, tamanho, resolucao)
+            response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
+            
+        conn.commit()
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+    
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
 
 # Compra =========================================================================
 
@@ -558,9 +767,57 @@ def change_product(id_produto):
 
 
 @app.route('/compra/', methods=['POST'])
-def order():
-    # TODO:
-    pass
+@verify_token
+def order(user_id, type_user):
+    logger.info('POST /compra')
+    payload = flask.request.get_json()
+
+    if(type_user != "comprador"):
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Apenas Compradores podem efetuar compras!"}
+        return jsonify(reponse)
+
+    if 'cart' not in payload:
+        response = {'status': StatusCodes['api_error'],
+                    'results': 'cart is required to update'}
+        return flask.jsonify(response)
+
+    for i in range(len(payload['cart'])):
+        if 'quantidade' not in payload['cart'][i]:
+            response = {'status': StatusCodes['api_error'],
+                        'results': 'quantidade is required to update'}
+            return flask.jsonify(response)
+        if 'product_id' not in payload['cart'][i]:
+            response = {'status': StatusCodes['api_error'],
+                        'results': 'product_id is required to update'}
+            return flask.jsonify(response)
+
+    add = 'SELECT add_compra(%s,%s);'
+    values = (payload['cart'], user_id)
+
+    conn = db_connection()
+    cur = conn.cursor()  # TODO: FAZER AGR A FUNCAO SQL TP A DO DAVID
+    try:
+        cur.execute(add, values)
+
+        reponse = {'Status': StatusCodes['success'],
+                   'Results': 'Compra efetuada!'}
+
+        conn.commit()
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /compra - error: {error}')
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(reponse)
+
+    return
 
 # Rating =========================================================================
 
@@ -568,8 +825,15 @@ def order():
 
 
 @app.route('/ratings/<produto_id>', methods=['POST'])
+@verify_token
 def rating(produto_id):
-    # TODO:
+    logger.info(f'POST /ratings/{produto_id}')
+    payload = flask.request.get_json()
+
+    if 'valor' not in payload:
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir o valor da rating"}
+        return jsonify(reponse)
     pass
 
 # Comentario =====================================================================
