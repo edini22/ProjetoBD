@@ -1,36 +1,37 @@
 --COMPRA============================================================================ CURRENT_DATE
--- DROP FUNCTION add_item; 
--- CREATE  FUNCTION add_item(Quantidade INT,Compra_id INTEGER,Produto_id INTEGER,Versao_produto INTEGER)
--- RETURNS void
--- AS
--- $$
--- DECLARE
---     Notificacao_id INTEGER; --FAZER UMA NOTIFICACAO PARA ADICIONAR AO ITEM!!
---     vendedor INTEGER ;
---     versao INTEGER;
---     BEGIN
---         SELECT p.vendedor_id into vendedor  FROM produtos p where p.id = Produto_id;
---         SELECT MAX(p.versao) into versao FROM produtos p where p.id = Produto_id;
---         INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id,notificacao_compra_id) VALUES (Quantidade,Compra_id,Produto_id,versao , vendedor ,Notificacao_id);
--- END;
--- $$ LANGUAGE plpgsql;
+DROP FUNCTION add_item; 
+CREATE  FUNCTION add_item(Quantidade INT,Compra_id INTEGER,Produto_id INTEGER,Versao_produto INTEGER)
+RETURNS void
+AS
+$$
+DECLARE
+    Notificacao_id INTEGER; --FAZER UMA NOTIFICACAO PARA ADICIONAR AO ITEM!!
+    vendedor INTEGER ;
+    versao INTEGER;
+    BEGIN
+        SELECT p.vendedor_id into vendedor  FROM produtos p where p.id = Produto_id;
+        SELECT MAX(p.versao) into versao FROM produtos p where p.id = Produto_id;
+        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id,notificacao_compra_id) VALUES (Quantidade,Compra_id,Produto_id,versao , vendedor ,Notificacao_id);
+END;
+$$ LANGUAGE plpgsql;
 
--- DROP FUNCTION add_compra; 
--- CREATE  FUNCTION add_compra(js json ,Id_comprador INTEGER)
--- RETURNS void
--- AS
--- $$
--- DECLARE
--- preco_total FLOAT := 0;
--- BEGIN
---     --LOOP COM O JSON   #
---     --VERIFICAR SE EXISTE ESSE PRODUTO !!
+DROP FUNCTION add_compra; 
+CREATE  FUNCTION add_compra(js json ,Id_comprador INTEGER)
+RETURNS void
+AS
+$$
+DECLARE
+preco_total FLOAT := 0;
+BEGIN
+    --LOOP COM O JSON   #
+    --VERIFICAR SE EXISTE ESSE PRODUTO !!
 
 
---     INSERT INTO compra (compra_valor,compra_data,comprador_id) VALUES (preco_total,CURRENT_DATE,Id_comprador);
+    INSERT INTO compra (compra_valor,compra_data,comprador_id) VALUES (preco_total,CURRENT_DATE,Id_comprador);
  
--- END;
--- $$ LANGUAGE plpgsql;-- FUNCOES ==========================================================================
+END;
+$$ LANGUAGE plpgsql;
+-- FUNCOES ==========================================================================
 
 --TODO: FAZER PROTECOES PARA VER SE ESSE PRODUTO AO INSERIR JA EXISTE!!!!
 

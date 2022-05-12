@@ -15,4 +15,6 @@ SELECT u.id  FROM utilizadores u, admins c WHERE  u.id = c.utilizador_id and u.u
 SELECT id FROM produtos
     WHERE produtos.nome like 'Computador1' and produtos.vendedor_id = ID_VENDEDOR('infortech'); 
 
+SELECT  MAX(versao) FROM produtos  WHERE id = 1 ;
+
 

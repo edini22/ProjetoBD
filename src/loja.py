@@ -1,9 +1,6 @@
 from urllib import response
-from attr import define
 from flask import Flask, request, jsonify
-from re import A
 import datetime
-from email import utils
 from functools import wraps
 import flask
 import jwt
@@ -594,7 +591,7 @@ def new_product(user_id, type_user):
 # http://localhost:8080/produto/{produto_id}
 
 # TODO: Mudar f strings para proteger de ataques
-@app.route('/produtos/<produto_id>', methods=['PUT'])
+@app.route('/produtos/<produto_id>', methods=['PUT'])#TODO: PROTEGER PARA SE NAO EXISTIR ESSE PRODUTO_ID!!!
 @verify_token
 def change_product(user_id, type_user,produto_id):
     logger.info('PUT /poduto/<produto_id>')
@@ -630,25 +627,18 @@ def change_product(user_id, type_user,produto_id):
             return jsonify(response)
 
         # Selecionar os dados da versao anterior do produto
-        cur.execute('SELECT nome FROM produtos WHERE id = %s;', produto_id)
-        nome = cur.fetchall()
-        nome = nome[0][0]
 
-        cur.execute('SELECT descricao FROM produtos WHERE id = %s;', produto_id)
-        descricao = cur.fetchall()
-        descricao = descricao[0][0]
+        cur.execute('SELECT  MAX(versao) FROM produtos  WHERE id = %s ;', produto_id)
+        versao = cur.fetchall()[0][0] 
 
-        cur.execute('SELECT preco FROM produtos WHERE id = %s;', produto_id)
-        preco = cur.fetchall()
-        preco = preco[0][0]
-
-        cur.execute('SELECT stock FROM produtos WHERE id = %s;', produto_id)
-        stock = cur.fetchall()
-        stock = stock[0][0]
-
-        cur.execute('SELECT versao FROM produtos WHERE id = %s;', produto_id)
-        versao = cur.fetchall()
-        versao = versao[0][0] + 1  # aumentar a versao em 1 valor
+        sel = 'SELECT p.nome, p.descricao, p.preco, p.stock FROM produtos p WHERE p.id = %s and p.versao = %s;'
+        variaveis = (produto_id,versao)
+        cur.execute(sel,variaveis)
+        row = cur.fetchall()
+        nome = row[0][0]
+        descricao = row[0][1]
+        preco = row[0][2]
+        stock = row[0][3]
 
         cur.execute('SELECT GET_TIPO(%s);', produto_id)
         tipo = cur.fetchall()
@@ -668,21 +658,14 @@ def change_product(user_id, type_user,produto_id):
             nome = payload['stock']
 
         if tipo == 'computador':
-            cur.execute('SELECT c.processador FROM computadores c WHERE c.produto_id = %s;', produto_id)
-            processador = cur.fetchall()
-            processador = processador[0][0]
-
-            cur.execute('SELECT c.ram FROM computadores c WHERE c.produto_id = %s;', produto_id)
-            ram = cur.fetchall()
-            ram = ram[0][0]
-
-            cur.execute('SELECT c.rom FROM computadores c WHERE c.produto_id = %s;', produto_id)
-            rom = cur.fetchall()
-            rom = rom[0][0]
-
-            cur.execute('SELECT c.processador FROM computadores c WHERE c.produto_id = %s;', produto_id)
-            grafica = cur.fetchall()
-            grafica = grafica[0][0]
+            var = 'SELECT c.processador,c.ram,c.rom,c.grafica FROM computadores c WHERE c.produto_id = %s and c.produto_versao = %s;'
+            val =  (produto_id,versao)
+            cur.execute(var,val)
+            rows = cur.fetchall()
+            processador = rows[0][0]
+            ram = rows[0][1]
+            rom = rows[0][2]
+            grafica = rows[0][3]
 
             if 'processador' in payload:
                 processador = payload['processador']
@@ -695,6 +678,8 @@ def change_product(user_id, type_user,produto_id):
 
             if 'grafica' in payload:
                 grafica = payload['grafica']
+
+            versao +=  1  # aumentar a versao em 1 valor
             
             add = 'SELECT add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
             values = (produto_id, versao, nome, descricao, preco, stock, user_id, processador, ram, rom, grafica)
@@ -703,17 +688,13 @@ def change_product(user_id, type_user,produto_id):
             response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
 
         elif tipo == 'telemovel':
-            cur.execute('SELECT tamanho FROM telemoveis WHERE id = %s;', produto_id)
-            tamanho = cur.fetchall()
-            tamanho = tamanho[0][0]
-
-            cur.execute('SELECT ram FROM telemoveis WHERE id = %s;', produto_id)
-            ram = cur.fetchall()
-            ram = ram[0][0]
-
-            cur.execute('SELECT rom FROM telemoveis WHERE id = %s;', produto_id)
-            rom = cur.fetchall()
-            rom = rom[0][0]
+            var = 'SELECT t.tamanho,t.ram,t.rom FROM telemoveis t WHERE t.produto_id = %s and t.produto_versao = %s;'
+            val = ( produto_id,versao)
+            cur.execute(var, val)
+            rows = cur.fetchall()
+            tamanho = rows[0][0]
+            ram = rows[0][1]
+            rom = rows[0][2]
 
             if 'tamanho' in payload:
                 tamanho = payload['rom']
@@ -724,24 +705,27 @@ def change_product(user_id, type_user,produto_id):
             if 'rom' in payload:
                 rom = payload['rom']
 
+            versao +=  1  # aumentar a versao em 1 valor
+
             cur.execute('SELECT add_telemovel(%s,%s, %s, %s, %s, %s, %s, %s, %s, %s);',
                         produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, ram, rom)
             response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
 
         elif tipo == 'televisao':
-            cur.execute('SELECT tamanho FROM televisoes WHERE id = %d;', produto_id)
-            tamanho = cur.fetchall()
-            tamanho = tamanho[0][0]
-
-            cur.execute('SELECT resolucao FROM televisoes WHERE id = %d;', produto_id)
-            resolucao = cur.fetchall()
-            resolucao = resolucao[0][0]
+            var = 'SELECT t.tamanho,t.resolucao FROM televisoes t WHERE t.produto_id = %d and t.produto_versao = %s;'
+            val = (produto_id,versao)
+            cur.execute(var,val)
+            rows = cur.fetchall()
+            tamanho = rows[0][0]
+            resolucao = resolucao[0][1]
 
             if 'tamanho' in payload:
                 tamanho = payload['rom']
 
             if 'resolucao' in payload:
                 resolucao = payload['resolucao']
+
+            versao +=  1  # aumentar a versao em 1 valor
 
             cur.execute('SELECT add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
                         produto_id, nome, descricao, preco, stock, user_id, tamanho, resolucao)
@@ -826,7 +810,7 @@ def order(user_id, type_user):
 
 @app.route('/ratings/<produto_id>', methods=['POST'])
 @verify_token
-def rating(produto_id):
+def rating(user_id, type_user,produto_id):
     logger.info(f'POST /ratings/{produto_id}')
     payload = flask.request.get_json()
 
@@ -843,7 +827,7 @@ def rating(produto_id):
 
 
 @app.route('/comentario_normal/<produto_id>', methods=['POST'])
-def comment(produto_id):
+def comment(user_id, type_user,produto_id):
     # TODO:
     pass
 
