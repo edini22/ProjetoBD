@@ -1,6 +1,6 @@
 -- Eliminar tableas se existirem
 DROP TABLE IF EXISTS admins;
-DROP TABLE IF EXISTS comentario_normal;
+DROP TABLE IF EXISTS comentario;
 DROP TABLE IF EXISTS computadores;
 DROP TABLE IF EXISTS televisoes;
 DROP TABLE IF EXISTS telemoveis;
@@ -62,16 +62,15 @@ CREATE TABLE admins (
 	PRIMARY KEY(utilizador_id)
 );
 -- TODO: talvez alterar o nome desta tabela para 'comentario'
-CREATE TABLE comentario_normal (
+CREATE TABLE comentario(
 	id SERIAL,
 	texto VARCHAR(512) NOT NULL,
 	utilizador_id BIGINT NOT NULL,
-	comentario_pai_id BIGINT NOT NULL,
+	comentario_pai_id BIGINT,
 	-- Retirei o Unique pq nao sei se ia afetar um comentario ter varias respostas por exemplo
 	produto_id BIGINT NOT NULL,
-	produto_versao			 INTEGER NOT NULL, -- QUESTION: sera necessario ter a versao? os comentarios podiam ficar iguais em todas as versoes
-	notificacao_id BIGINT NOT NULL UNIQUE,
-	PRIMARY KEY(notificacao_id) -- QUESTION: isto esta bem?
+	produto_versao	INTEGER NOT NULL,
+	PRIMARY KEY(id)
 );
 CREATE TABLE notificacoes (
 	id SERIAL,
@@ -129,16 +128,14 @@ ALTER TABLE vendedores
 ADD CONSTRAINT vendedores_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
 ALTER TABLE admins
 ADD CONSTRAINT admins_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
-ALTER TABLE comentario_normal
-ADD CONSTRAINT comentario_normal_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
+ALTER TABLE comentario
+ADD CONSTRAINT comentario_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
 -- ALTER TABLE comentario_normal -- FIXME: alterei para como esta na linha abaixo
 -- ADD CONSTRAINT comentario_normal_fk2 FOREIGN KEY (notificacao_normal_id) REFERENCES comentario_normal(notificacao_id);
-ALTER TABLE comentario_normal
-ADD CONSTRAINT comentario_normal_fk2 FOREIGN KEY (comentario_pai_id) REFERENCES comentario_normal(id);
-ALTER TABLE comentario_normal
-ADD CONSTRAINT comentario_normal_fk3 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
-ALTER TABLE comentario_normal
-ADD CONSTRAINT comentario_normal_fk4 FOREIGN KEY (notificacao_id) REFERENCES notificacoes(id);
+ALTER TABLE comentario
+ADD CONSTRAINT comentariol_fk2 FOREIGN KEY (comentario_pai_id) REFERENCES comentario(id);
+ALTER TABLE comentario
+ADD CONSTRAINT comentario_fk3 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
 ALTER TABLE televisoes
 ADD CONSTRAINT televisoes_fk1 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
 ALTER TABLE telemoveis

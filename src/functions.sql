@@ -142,31 +142,46 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- COMENTARIOS ============================================================================================
--- drop function add_comentario1;
+drop function add_comentario1;
 CREATE  FUNCTION add_comentario1(texto VARCHAR, utilizador INT, produto INT)
 RETURNS VOID
 AS
 $$
 DECLARE
-BEGIN -- FIXME: verificar aqui as notificacao_id e a versao
-    INSERT INTO comentario_normal (texto, utilizador_id, produto_id) VALUES (texto, utilizador, produto);
+BEGIN
+    INSERT INTO comentario (texto, utilizador_id, produto_id, produto_versao) VALUES (texto, utilizador, produto, max_versao(produto));
 
 END;
 $$ LANGUAGE plpgsql;
 
--- drop function add_comentario2;
+drop function add_comentario2;
 CREATE  FUNCTION add_comentario2(texto VARCHAR, utilizador INT, produto INT, comentario_pai INT)
 RETURNS VOID
 AS
 $$
 DECLARE
-BEGIN -- FIXME: verificar aqui as notificacao_id e a versao
-    INSERT INTO comentario_normal (texto, utilizador_id, produto_id, comentario_pai_id) VALUES (texto, utilizador, produto, comentario_pai);
+BEGIN
+    INSERT INTO comentario (texto, utilizador_id, produto_id, comentario_pai_id, produto_versao) VALUES (texto, utilizador, produto, comentario_pai, max_versao(produto));
 
 END;
 $$ LANGUAGE plpgsql;
 
 -- NOTIFICACOES ==============================================================================================================
+
+CREATE OR REPLACE FUNCTION max_id_notificacoes()
+RETURNS INT
+AS
+$$
+DECLARE
+    idd INT;
+BEGIN
+    SELECT MAX(id) INTO idd FROM notificacoes; 
+    IF idd is NULL THEN
+     idd := 0;
+    END IF;
+    RETURN idd;
+END;
+$$ LANGUAGE plpgsql;
 
 --TODO: fazer uma funcao que devolva todas as notificacoes do user
 
@@ -202,6 +217,22 @@ BEGIN
      idd := 0;
     END IF;
     RETURN idd;
+END;
+$$ LANGUAGE plpgsql;
+
+--Devolve max versao de um produto
+CREATE OR REPLACE FUNCTION max_versao(produto INT)
+RETURNS INT
+AS
+$$
+DECLARE
+    ver INT;
+BEGIN
+    SELECT MAX(versao) INTO ver FROM produtos p WHERE p.id = produto; 
+    IF ver is NULL THEN
+     ver := 0;
+    END IF;
+    RETURN ver;
 END;
 $$ LANGUAGE plpgsql;
 

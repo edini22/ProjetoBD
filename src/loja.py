@@ -1,3 +1,4 @@
+from ctypes import util
 from urllib import response
 from flask import Flask, request, jsonify
 import datetime
@@ -874,10 +875,51 @@ def rating(user_id, type_user, produto_id):
 
 
 # Comentario =====================================================================
-
 # http://localhost:8080/questions/{produto_id}
 
-@app.route('/comentario_normal/<produto_id>', methods=['POST'])
+@app.route('/comentario/<produto_id>', methods=['GET'])
+def see_comments(produto_id):
+    logger.info(f'GET /comentario/{produto_id}')
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute(
+            'SELECT c.id, c.texto, c.utilizador_id, c.produto_id, c.comentario_pai_id FROM comentario c WHERE c.produto_id = %s', produto_id)
+        rows = cur.fetchall()
+        print(rows)
+
+        logger.debug('GET /comentario - parse')
+        Results = []
+        for row in rows:
+            idd = row[0]
+            texto = row[1]
+            utilizador = row[2]
+            produto = row[3]
+            comentario_pai = row[4]
+            logger.debug(row)
+
+            content = {'ID': int(idd), 'Texto': texto, 'Utilizador': utilizador,'ID Produto:': produto, 'ID Comentario pai': comentario_pai}
+            Results.append(content)
+        
+        response = {'Status': StatusCodes['success'], 'results': Results}
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response) 
+
+# http://localhost:8080/comentario/{produto_id}
+
+@app.route('/comentario/<produto_id>', methods=['POST'])
 @verify_token
 def comment1(user_id, type_user, produto_id):
     logger.info(f'POST /comentario_normal/{produto_id}')
@@ -912,10 +954,8 @@ def comment1(user_id, type_user, produto_id):
     return flask.jsonify(response)   
 
     
-
-
 # http://localhost:8080/questions/{produto_id}/{comentario_pai}
-@app.route('/comentario_normal/<produto_id>/<comentario_pai>', methods=['POST'])
+@app.route('/comentario/<produto_id>/<comentario_pai>', methods=['POST'])
 @verify_token
 def comment2(user_id, type_user, produto_id, comentario_pai):
     logger.info(f'POST /comentario_normal/{produto_id}')
