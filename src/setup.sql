@@ -30,7 +30,6 @@ CREATE TABLE itens (
 	produto_id BIGINT,
 	versao_produto INTEGER NOT NULL,
 	vendedor_id INTEGER NOT NULL,
-	notificacao_compra_id BIGINT NOT NULL UNIQUE,
 	PRIMARY KEY(compra_id, produto_id,versao_produto)
 );
 CREATE TABLE ratings (
@@ -77,6 +76,8 @@ CREATE TABLE notificacoes (
 	id SERIAL,
 	vista BOOL NOT NULL,
 	data DATE NOT NULL,
+	texto	 VARCHAR(512) NOT NULL,
+	utilizador_id INTEGER NOT NULL,
 	PRIMARY KEY(id)
 );
 CREATE TABLE televisoes (

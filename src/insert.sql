@@ -5,13 +5,12 @@ RETURNS void
 AS
 $$
 DECLARE
-    Notificacao_id INTEGER; --FAZER UMA NOTIFICACAO PARA ADICIONAR AO ITEM!!
     vendedor INTEGER ;
     versao INTEGER;
     BEGIN
         SELECT p.vendedor_id into vendedor  FROM produtos p where p.id = Produto_id;
         SELECT MAX(p.versao) into versao FROM produtos p where p.id = Produto_id;
-        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id,notificacao_compra_id) VALUES (Quantidade,Compra_id,Produto_id,versao , vendedor ,Notificacao_id);
+        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id) VALUES (Quantidade,Compra_id,Produto_id,versao , vendedor );
 END;
 $$ LANGUAGE plpgsql;
 
