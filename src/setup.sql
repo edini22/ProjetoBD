@@ -61,16 +61,17 @@ CREATE TABLE admins (
 	utilizador_id BIGINT UNIQUE,
 	PRIMARY KEY(utilizador_id)
 );
+-- TODO: talvez alterar o nome desta tabela para 'comentario'
 CREATE TABLE comentario_normal (
 	id SERIAL,
 	texto VARCHAR(512) NOT NULL,
 	utilizador_id BIGINT NOT NULL,
-	notificacao_normal_id BIGINT NOT NULL,
+	comentario_pai_id BIGINT NOT NULL,
 	-- Retirei o Unique pq nao sei se ia afetar um comentario ter varias respostas por exemplo
 	produto_id BIGINT NOT NULL,
-	produto_versao			 INTEGER NOT NULL,
+	produto_versao			 INTEGER NOT NULL, -- QUESTION: sera necessario ter a versao? os comentarios podiam ficar iguais em todas as versoes
 	notificacao_id BIGINT NOT NULL UNIQUE,
-	PRIMARY KEY(notificacao_id)
+	PRIMARY KEY(notificacao_id) -- QUESTION: isto esta bem?
 );
 CREATE TABLE notificacoes (
 	id SERIAL,
@@ -130,8 +131,10 @@ ALTER TABLE admins
 ADD CONSTRAINT admins_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
 ALTER TABLE comentario_normal
 ADD CONSTRAINT comentario_normal_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
+-- ALTER TABLE comentario_normal -- FIXME: alterei para como esta na linha abaixo
+-- ADD CONSTRAINT comentario_normal_fk2 FOREIGN KEY (notificacao_normal_id) REFERENCES comentario_normal(notificacao_id);
 ALTER TABLE comentario_normal
-ADD CONSTRAINT comentario_normal_fk2 FOREIGN KEY (notificacao_normal_id) REFERENCES comentario_normal(notificacao_id);
+ADD CONSTRAINT comentario_normal_fk2 FOREIGN KEY (comentario_pai_id) REFERENCES comentario_normal(id);
 ALTER TABLE comentario_normal
 ADD CONSTRAINT comentario_normal_fk3 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
 ALTER TABLE comentario_normal

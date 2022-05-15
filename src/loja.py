@@ -7,6 +7,8 @@ import jwt
 import psycopg2
 import logging
 
+# pip install PyJWT
+
 app = flask.Flask(__name__)
 # imports
 
@@ -69,7 +71,7 @@ def generate_token(user_id, type_user):
 
 def verify_token(f):
     @wraps(f)
-    def decorator(*args,**kwargs):
+    def decorator(*args, **kwargs):
 
         token = None
         if 'Authorization' not in request.headers or not request.headers['Authorization']:
@@ -94,7 +96,7 @@ def verify_token(f):
             type_user = ""
             return jsonify({'status': StatusCodes['api_error'], 'errors': 'invalid token'})
 
-        return f(array[0], array[1],*args,**kwargs)
+        return f(array[0], array[1], *args, **kwargs)
 
     return decorator
 
@@ -189,6 +191,8 @@ def signIn():
 # http://localhost:8080/user/
 # qualquer um pode se registar como comprador
 # apenas admins adicionam admins e vendedores
+
+
 @app.route('/user/', methods=['POST'])
 @verify_token_login
 def new_user(type_user):
@@ -553,20 +557,20 @@ def new_product(user_id, type_user):
 
         if(payload['tipo'] == "computador"):
             add = 'SELECT add_computador(%s,1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
-            
-            values = (idd,payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
+
+            values = (idd, payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
                 user_id), payload['processador'], int(payload['ram']), int(payload['rom']), payload['grafica'])
             cur.execute(add, values)
 
         elif(payload['tipo'] == "telemovel"):
             add = 'SELECT add_telemovel(%s,1,%s,%s,%s,%s,%s,%s,%s,%s);'
-            values = (idd,payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
+            values = (idd, payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
                 user_id), float(payload['tamanho']), int(payload['ram']), int(payload['rom']))
             cur.execute(add, values)
 
         else:
             add = 'SELECT add_televisao(%s,1,%s,%s,%s,%s,%s,%s,%s);'
-            values = (idd,payload['nome'], payload['descricao'], float(payload['preco']), int(
+            values = (idd, payload['nome'], payload['descricao'], float(payload['preco']), int(
                 payload['stock']), int(user_id), float(payload['tamanho']), payload['resolucao'])
             cur.execute(add, values)
         tipo = payload['tipo']
@@ -588,12 +592,12 @@ def new_product(user_id, type_user):
     return flask.jsonify(reponse)
 
 
-# http://localhost:8080/produto/{produto_id}
-
-# TODO: Mudar f strings para proteger de ataques
-@app.route('/produtos/<produto_id>', methods=['PUT'])#TODO: PROTEGER PARA SE NAO EXISTIR ESSE PRODUTO_ID!!!
+# http://localhost:8080/produtos/{produto_id}
+# FIXME: quando se tenta atualizar o produto 8 diz que esta out of range
+# TODO: PROTEGER PARA SE NAO EXISTIR ESSE PRODUTO_ID!!!
+@app.route('/produtos/<produto_id>', methods=['PUT'])
 @verify_token
-def change_product(user_id, type_user,produto_id):
+def change_product(user_id, type_user, produto_id):
     logger.info('PUT /poduto/<produto_id>')
     payload = flask.request.get_json()
 
@@ -604,23 +608,25 @@ def change_product(user_id, type_user,produto_id):
         return jsonify(response)
 
     # Verificar se algum dos paremetros esta no body da mensagem
-    lista = ['nome', 'descricao', 'preco', 'stock', 'processador', 'ram', 'rom', 'grafica', 'tamanho', 'resolucao']
+    lista = ['nome', 'descricao', 'preco', 'stock', 'processador',
+             'ram', 'rom', 'grafica', 'tamanho', 'resolucao']
     count = 0
     for i in lista:
         if i not in payload:
-            count +=1
+            count += 1
     if count == len(lista):
         response = {'Status': StatusCodes['internal_error'],
                     'error': "Nenhum parametro correto para atualizar o produto."}
         return jsonify(response)
-    
 
     conn = db_connection()
     cur = conn.cursor()
-    try: 
+    try:
         # Verificar se o user é vendedor do produto
-        cur.execute('SELECT vendedor_id FROM produtos WHERE %s = vendedor_id;', user_id)
+        cur.execute(
+            'SELECT vendedor_id FROM produtos WHERE %s = vendedor_id;', user_id)
         vendedor_id = cur.fetchall()[0][0]
+        print(vendedor_id)
         if vendedor_id != int(user_id):
             response = {'Status': StatusCodes['internal_error'],
                         'error': "Nao tem permissao para alterar este produto."}
@@ -628,12 +634,13 @@ def change_product(user_id, type_user,produto_id):
 
         # Selecionar os dados da versao anterior do produto
 
-        cur.execute('SELECT  MAX(versao) FROM produtos  WHERE id = %s ;', produto_id)
-        versao = cur.fetchall()[0][0] 
+        cur.execute(
+            'SELECT  MAX(versao) FROM produtos  WHERE id = %s ;', produto_id)
+        versao = cur.fetchall()[0][0]
 
         sel = 'SELECT p.nome, p.descricao, p.preco, p.stock FROM produtos p WHERE p.id = %s and p.versao = %s;'
-        variaveis = (produto_id,versao)
-        cur.execute(sel,variaveis)
+        variaveis = (produto_id, versao)
+        cur.execute(sel, variaveis)
         row = cur.fetchall()
         nome = row[0][0]
         descricao = row[0][1]
@@ -659,8 +666,8 @@ def change_product(user_id, type_user,produto_id):
 
         if tipo == 'computador':
             var = 'SELECT c.processador,c.ram,c.rom,c.grafica FROM computadores c WHERE c.produto_id = %s and c.produto_versao = %s;'
-            val =  (produto_id,versao)
-            cur.execute(var,val)
+            val = (produto_id, versao)
+            cur.execute(var, val)
             rows = cur.fetchall()
             processador = rows[0][0]
             ram = rows[0][1]
@@ -669,7 +676,7 @@ def change_product(user_id, type_user,produto_id):
 
             if 'processador' in payload:
                 processador = payload['processador']
-            
+
             if 'ram' in payload:
                 ram = payload['ram']
 
@@ -679,17 +686,19 @@ def change_product(user_id, type_user,produto_id):
             if 'grafica' in payload:
                 grafica = payload['grafica']
 
-            versao +=  1  # aumentar a versao em 1 valor
-            
+            versao += 1  # aumentar a versao em 1 valor
+
             add = 'SELECT add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
-            values = (produto_id, versao, nome, descricao, preco, stock, user_id, processador, ram, rom, grafica)
-            cur.execute(add,values)
-                
-            response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
+            values = (produto_id, versao, nome, descricao, preco,
+                      stock, user_id, processador, ram, rom, grafica)
+            cur.execute(add, values)
+
+            response = {
+                'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
 
         elif tipo == 'telemovel':
             var = 'SELECT t.tamanho,t.ram,t.rom FROM telemoveis t WHERE t.produto_id = %s and t.produto_versao = %s;'
-            val = ( produto_id,versao)
+            val = (produto_id, versao)
             cur.execute(var, val)
             rows = cur.fetchall()
             tamanho = rows[0][0]
@@ -705,16 +714,17 @@ def change_product(user_id, type_user,produto_id):
             if 'rom' in payload:
                 rom = payload['rom']
 
-            versao +=  1  # aumentar a versao em 1 valor
+            versao += 1  # aumentar a versao em 1 valor
 
             cur.execute('SELECT add_telemovel(%s,%s, %s, %s, %s, %s, %s, %s, %s, %s);',
                         produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, ram, rom)
-            response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
+            response = {
+                'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
 
         elif tipo == 'televisao':
             var = 'SELECT t.tamanho,t.resolucao FROM televisoes t WHERE t.produto_id = %d and t.produto_versao = %s;'
-            val = (produto_id,versao)
-            cur.execute(var,val)
+            val = (produto_id, versao)
+            cur.execute(var, val)
             rows = cur.fetchall()
             tamanho = rows[0][0]
             resolucao = resolucao[0][1]
@@ -725,19 +735,20 @@ def change_product(user_id, type_user,produto_id):
             if 'resolucao' in payload:
                 resolucao = payload['resolucao']
 
-            versao +=  1  # aumentar a versao em 1 valor
+            versao += 1  # aumentar a versao em 1 valor
 
             cur.execute('SELECT add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
                         produto_id, nome, descricao, preco, stock, user_id, tamanho, resolucao)
-            response = {'Status': StatusCodes['success'],'Results': f'Produto \'{nome}\' atualizado'}
-            
+            response = {
+                'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
+
         conn.commit()
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
             'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
-    
+
     finally:
         if conn is not None:
             conn.close()
@@ -801,35 +812,142 @@ def order(user_id, type_user):
 
     return flask.jsonify(reponse)
 
-    return
 
 # Rating =========================================================================
 
 # http://localhost:8080/rating/{produto_id}
 
-
 @app.route('/ratings/<produto_id>', methods=['POST'])
 @verify_token
-def rating(user_id, type_user,produto_id):
+def rating(user_id, type_user, produto_id):
     logger.info(f'POST /ratings/{produto_id}')
     payload = flask.request.get_json()
 
+    if type_user != 'comprador':
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Apenas um comprador pode avaliar produtos"}
+        return jsonify(reponse)
+
     if 'valor' not in payload:
         reponse = {
-            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir o valor da rating"}
+            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir o valor do rating"}
         return jsonify(reponse)
-    pass
+
+    if 'comentario' not in payload:
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir um comentario no seu rating"}
+        return jsonify(reponse)
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        statement = "SELECT user_bought_product(%s,%s)"
+        values = (user_id, produto_id)
+        # Funcao devolve 0 se nunca comprou o produto, caso contrario devolve a versao que comprou
+        # FIXME: verificar o que acontece se o comprador comprar duas versoes do mesmo produto
+        cur.execute(statement, values)
+        versao = cur.fetchall()[0][0]
+        print(f"DEBUG: Valor do comprou -> {versao}")
+
+        if(versao == 0):
+            reponse = {
+                'Status': StatusCodes['internal_error'], 'error': "Para avaliar um produto tem de o comprar"}
+            return jsonify(reponse)
+
+        cur.execute("SELECT add_rating(%s, %s, %s, %s, %s)",
+                    payload['valor'], payload['comentario'],user_id, produto_id, versao)
+        
+        response = {'Status': StatusCodes['success'], 'Results': "Rating inserido com sucesso"}
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
 
 # Comentario =====================================================================
 
 # http://localhost:8080/questions/{produto_id}
-# http://localhost:8080/questions/{produto_id}/{comentario_pai_id}
-
 
 @app.route('/comentario_normal/<produto_id>', methods=['POST'])
-def comment(user_id, type_user,produto_id):
-    # TODO:
-    pass
+@verify_token
+def comment1(user_id, type_user, produto_id):
+    logger.info(f'POST /comentario_normal/{produto_id}')
+    payload = flask.request.get_json()
+
+    if 'texto' not in payload:
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir texto no seu comentario"}
+        return jsonify(reponse)
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        statement = 'SELECT add_comentario1(%s, %s, %s)'
+        values = (payload['texto'], user_id, produto_id)
+
+        cur.execute(statement, values)
+
+        response = {'Status': StatusCodes['success'], 'Results': "Comentario adicionado com sucesso"}
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)   
+
+    
+
+
+# http://localhost:8080/questions/{produto_id}/{comentario_pai}
+@app.route('/comentario_normal/<produto_id>/<comentario_pai>', methods=['POST'])
+@verify_token
+def comment2(user_id, type_user, produto_id, comentario_pai):
+    logger.info(f'POST /comentario_normal/{produto_id}')
+    payload = flask.request.get_json()
+
+    if 'texto' not in payload:
+        reponse = {
+            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir texto no seu comentario"}
+        return jsonify(reponse)
+
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        statement = 'SELECT add_comentario2(%s, %s, %s, %s)'
+        values = (payload['texto'], user_id, produto_id, comentario_pai)
+
+        cur.execute(statement, values)
+
+        response = {'Status': StatusCodes['success'], 'Results': "Comentario resposta adicionado com sucesso"}
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
 
 
 if __name__ == '__main__':
