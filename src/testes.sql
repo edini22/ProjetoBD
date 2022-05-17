@@ -25,7 +25,7 @@ SELECT * from compras;
 SELECT add_compra('[
             {
                 "product_id": 1,
-                "quantidade" : 1
+                "quantidade" : 3
     
             },{
                 "product_id": 2,
