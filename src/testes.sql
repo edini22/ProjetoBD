@@ -4,7 +4,8 @@
 -- SELECT * FROM admins;
 
 -- SELECT * FROM produtos;
--- SELECT * FROM computadores;
+-- SELECT * FROM televisoes;
+-- SELECT * FROM computadores c WHERE c.produto_id = 1 AND c.produto_versao = 1;
 
 -- SELECT id FROM produtos
 -- WHERE produtos.nome like 'Computador1';

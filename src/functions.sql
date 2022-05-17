@@ -52,20 +52,20 @@ DECLARE
     idd INT :=0;
 BEGIN 
     SELECT p.id INTO idd FROM produtos p, computadores c WHERE p.id = c.produto_id;
-    IF idd > 0  THEN
+    IF idd < 0  THEN
         tipo := 'computador';
         cond:=1;
     END IF;
     IF cond = 0  THEN
         SELECT p.id INTO idd FROM produtos p, telemoveis t WHERE p.id = t.produto_id;
-        IF  idd > 0  THEN
+        IF idd < 0  THEN
             tipo := 'telemovel';
             cond:=1;
         END IF;
     END IF;
-    IF cond = 0  THEN
-        SELECT p.id INTO idd FROM produtos p, televisao t WHERE  p.id = t.produto_id;
-        IF  idd > 0  THEN
+    IF cond = 0 THEN
+        SELECT p.id INTO idd FROM produtos p, televisoes t WHERE  p.id = t.produto_id;
+        IF idd < 0 THEN
             tipo:= 'televisao';
             cond:=1;
         END IF;
@@ -92,22 +92,36 @@ DECLARE
 END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION add_compra; 
-CREATE  FUNCTION add_compra(js json ,Id_comprador INTEGER)
-RETURNS void
-AS
-$$
-DECLARE
-preco_total FLOAT := 0;
-BEGIN
-    --LOOP COM O JSON   #
-    --VERIFICAR SE EXISTE ESSE PRODUTO !!
+-- DROP FUNCTION add_compra; 
+-- CREATE  FUNCTION add_compra(js json ,Id_comprador INTEGER)
+-- RETURNS void
+-- AS
+-- $$
+-- DECLARE
+-- preco_total FLOAT := 0;
+-- idd INT;
+-- quant INTEGER;
+-- id_produto INTEGER;
+
+-- BEGIN
+--     --LOOP COM O JSON   #
+--     --VERIFICAR SE EXISTE ESSE PRODUTO !!
+--     INSERT INTO compras (compra_valor,compra_data,comprador_id) VALUES (0,CURRENT_DATE,Id_comprador);
+--     SELECT compra_id INTO idd FROM compras WHERE compra_valor = 0 and compra_data = CURRENT_DATE and comprador_id = Id_comprador;
+
+--     --loop com json adicionar a tabela itens 
+--     FOR c in son_array_length(json) LOOP
+--     raise notice 'c: %', cnt;
+--     END LOOP;
+
+--     --UPDATE !!
+--     UPDATE compra SET compra_valor = preco_total WHERE compra_id = idd;
 
 
-    INSERT INTO compra (compra_valor,compra_data,comprador_id) VALUES (preco_total,CURRENT_DATE,Id_comprador);
+--     INSERT INTO compras (compra_valor,compra_data,comprador_id) VALUES (preco_total,CURRENT_DATE,Id_comprador);
  
-END;
-$$ LANGUAGE plpgsql;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 
 -- RATINGS ================================================================================================

@@ -192,7 +192,6 @@ def signIn():
 # qualquer um pode se registar como comprador
 # apenas admins adicionam admins e vendedores
 
-
 @app.route('/user/', methods=['POST'])
 @verify_token_login
 def new_user(type_user):
@@ -296,28 +295,57 @@ def get_all_produts():
     conn = db_connection()
     cur = conn.cursor()
 
-    try:
-        cur.execute('SELECT * FROM produtos')
-        rows = cur.fetchall()
+    # try:
 
-        logger.debug('GET /produtos - parse')
-        Results = []
-        for row in rows:
-            logger.debug(row)
-            content = {'ID': int(row[0]), 'Nome': row[1], 'Descricao': row[2], 'Preco': int(
-                row[3]), 'Stock': int(row[4]), 'Versao': int(row[5]), 'ID Vendedor': int(row[6])}
-            Results.append(content)
+    cur.execute('SELECT * FROM produtos')
+    rows = cur.fetchall()
 
-        reponse = {'Status': StatusCodes['success'], 'Results': Results}
+    logger.debug('GET /produtos - parse')
+    Results = []
+    for row in rows:
+        # Argumentos Gerais
+        content = {'ID': int(row[0]), 'Nome': row[1], 'Descricao': row[2], 'Preco': int(
+            row[3]), 'Stock': int(row[4]), 'Versao': int(row[5]), 'ID Vendedor': int(row[6])}
 
-    except(Exception, psycopg2.DatabaseError) as error:
-        logger.error(f'GET /produtos - error: {error}')
-        reponse = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        # Argumentos particulares
+        cur.execute('SELECT GET_TIPO(%s);', (int(row[0]),))
+        tipo = cur.fetchall()[0][0]
+        print(tipo)
+        
+        if tipo == 'computador':
+            cur.execute('SELECT * FROM computadores c WHERE c.produto_id = %s AND c.produto_versao = %s;',(row[0], row[5]))
+            row2 = cur.fetchall()
+            print(row2)
+            aux = {'Processador': row2[0][0],'Ram': int(row2[0][1]), 'Rom': int(row2[0][2]),'Grafica': row2[0][3]}
+            content.update(aux)
 
-    finally:
-        if conn is not None:
-            conn.close()
+        elif tipo == 'telemovel':
+            cur.execute('SELECT * FROM telemoveis t WHERE t.produto_id = %s AND t.produto_versao = %s;',(row[0], row[5]))
+            row2 = cur.fetchall()
+            print(row2)
+            aux = {'Tamanho': float(row2[0][0]), 'Ram': int(row2[0][1]), 'Rom': int(row2[0][2])}
+            content.update(aux)
+
+        elif tipo == 'televisao':
+            cur.execute('SELECT * FROM televisoes t WHERE t.produto_id = %s AND t.produto_versao = %s;',(row[0], row[5]))
+            row2 = cur.fetchall()
+            print(row)
+            print(row2)
+            aux = {'Tamanho': float(row2[0][0]), 'Resolucao': int(row2[0][1])}
+            content.update(aux)
+
+        Results.append(content)
+
+    reponse = {'Status': StatusCodes['success'], 'Results': Results}
+
+    # except(Exception, psycopg2.DatabaseError) as error:
+    #     logger.error(f'GET /produtos - error: {error}')
+    #     reponse = {
+    #         'Status': StatusCodes['internal_error'], 'Error': str(error)}
+
+    # finally:
+    #     if conn is not None:
+    #         conn.close()
 
     return flask.jsonify(reponse)
 
@@ -553,7 +581,6 @@ def new_product(user_id, type_user):
     try:
         cur.execute('SELECT max_id();')
         idd = int(cur.fetchall()[0][0])+1
-        print(idd)
 
         if(payload['tipo'] == "computador"):
             add = 'SELECT add_computador(%s,1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
@@ -593,8 +620,6 @@ def new_product(user_id, type_user):
 
 
 # http://localhost:8080/produtos/{produto_id}
-# FIXME: quando se tenta atualizar o produto 8 diz que esta out of range
-# TODO: PROTEGER PARA SE NAO EXISTIR ESSE PRODUTO_ID!!!
 @app.route('/produtos/<produto_id>', methods=['PUT'])
 @verify_token
 def change_product(user_id, type_user, produto_id):
@@ -624,18 +649,16 @@ def change_product(user_id, type_user, produto_id):
     try:
         # Verificar se o user é vendedor do produto
         cur.execute(
-            'SELECT vendedor_id FROM produtos WHERE %s = vendedor_id;', user_id)
+            'SELECT vendedor_id FROM produtos WHERE %s = vendedor_id;', (user_id,))
         vendedor_id = cur.fetchall()[0][0]
-        print(vendedor_id)
         if vendedor_id != int(user_id):
             response = {'Status': StatusCodes['internal_error'],
                         'error': "Nao tem permissao para alterar este produto."}
             return jsonify(response)
 
         # Selecionar os dados da versao anterior do produto
-
         cur.execute(
-            'SELECT  MAX(versao) FROM produtos  WHERE id = %s ;', produto_id)
+            'SELECT  MAX(versao) FROM produtos  WHERE id = %s ;', (produto_id,))
         versao = cur.fetchall()[0][0]
 
         sel = 'SELECT p.nome, p.descricao, p.preco, p.stock FROM produtos p WHERE p.id = %s and p.versao = %s;'
@@ -647,9 +670,10 @@ def change_product(user_id, type_user, produto_id):
         preco = row[0][2]
         stock = row[0][3]
 
-        cur.execute('SELECT GET_TIPO(%s);', produto_id)
+        cur.execute('SELECT GET_TIPO(%s::INTEGER);', (produto_id,))
         tipo = cur.fetchall()
         tipo = tipo[0][0]
+        print(tipo)
 
         # Atualizar os dados para a nova versao do produto
         if 'nome' in payload:
@@ -665,7 +689,7 @@ def change_product(user_id, type_user, produto_id):
             nome = payload['stock']
 
         if tipo == 'computador':
-            var = 'SELECT c.processador,c.ram,c.rom,c.grafica FROM computadores c WHERE c.produto_id = %s and c.produto_versao = %s;'
+            var = 'SELECT c.processador, c.ram, c.rom, c.grafica FROM computadores c WHERE c.produto_id = %s and c.produto_versao = %s;'
             val = (produto_id, versao)
             cur.execute(var, val)
             rows = cur.fetchall()
@@ -673,6 +697,8 @@ def change_product(user_id, type_user, produto_id):
             ram = rows[0][1]
             rom = rows[0][2]
             grafica = rows[0][3]
+
+            versao += 1 # aumentar a versao em 1 valor
 
             if 'processador' in payload:
                 processador = payload['processador']
@@ -686,11 +712,9 @@ def change_product(user_id, type_user, produto_id):
             if 'grafica' in payload:
                 grafica = payload['grafica']
 
-            versao += 1  # aumentar a versao em 1 valor
-
             add = 'SELECT add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
             values = (produto_id, versao, nome, descricao, preco,
-                      stock, user_id, processador, ram, rom, grafica)
+                        stock, user_id, processador, ram, rom, grafica)
             cur.execute(add, values)
 
             response = {
@@ -716,18 +740,18 @@ def change_product(user_id, type_user, produto_id):
 
             versao += 1  # aumentar a versao em 1 valor
 
-            cur.execute('SELECT add_telemovel(%s,%s, %s, %s, %s, %s, %s, %s, %s, %s);',
-                        produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, ram, rom)
+            cur.execute('SELECT add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                        (produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, ram, rom))
             response = {
                 'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
 
         elif tipo == 'televisao':
-            var = 'SELECT t.tamanho,t.resolucao FROM televisoes t WHERE t.produto_id = %d and t.produto_versao = %s;'
+            var = 'SELECT t.tamanho,t.resolucao FROM televisoes t WHERE t.produto_id = %s and t.produto_versao = %s;'
             val = (produto_id, versao)
             cur.execute(var, val)
             rows = cur.fetchall()
             tamanho = rows[0][0]
-            resolucao = resolucao[0][1]
+            resolucao = rows[0][1]
 
             if 'tamanho' in payload:
                 tamanho = payload['rom']
@@ -737,12 +761,12 @@ def change_product(user_id, type_user, produto_id):
 
             versao += 1  # aumentar a versao em 1 valor
 
-            cur.execute('SELECT add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
-                        produto_id, nome, descricao, preco, stock, user_id, tamanho, resolucao)
+            cur.execute('SELECT add_televisao(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                        (produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, resolucao))
             response = {
                 'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
 
-        conn.commit()
+            conn.commit()
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
@@ -759,7 +783,6 @@ def change_product(user_id, type_user, produto_id):
 # Compra =========================================================================
 
 # http://localhost:8080/order
-
 
 @app.route('/compra/', methods=['POST'])
 @verify_token

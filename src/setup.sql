@@ -61,7 +61,6 @@ CREATE TABLE admins (
 	utilizador_id BIGINT UNIQUE,
 	PRIMARY KEY(utilizador_id)
 );
--- TODO: talvez alterar o nome desta tabela para 'comentario'
 CREATE TABLE comentario(
 	id SERIAL,
 	texto VARCHAR(512) NOT NULL,
