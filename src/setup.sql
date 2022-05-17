@@ -107,7 +107,7 @@ CREATE TABLE compras (
 	compra_id SERIAL,
 	compra_valor FLOAT(8) NOT NULL,
 	compra_data DATE NOT NULL,
-	comprador_id BIGINT NOT NULL UNIQUE,
+	comprador_id BIGINT NOT NULL,
 	PRIMARY KEY(compra_id)
 );
 -- Adicionar as FK nas tabelas

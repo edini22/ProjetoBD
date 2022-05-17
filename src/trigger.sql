@@ -1,3 +1,4 @@
+DROP TRIGGER t_atualiza_stock ON itens;--RESOLVER ESTE TRIGGER!!!
 CREATE TRIGGER t_atualiza_stock
 BEFORE INSERT ON itens
 FOR EACH ROW
