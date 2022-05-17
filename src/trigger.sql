@@ -16,7 +16,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER t_atualiza_stock ON itens;--TODO: RESOLVER ESTE TRIGGER!!!
+DROP TRIGGER IF EXISTS t_atualiza_stock ON itens;--TODO: RESOLVER ESTE TRIGGER!!!
 CREATE TRIGGER t_atualiza_stock
 BEFORE INSERT ON itens
 FOR EACH ROW
