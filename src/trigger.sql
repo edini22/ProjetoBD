@@ -1,4 +1,4 @@
-DROP TRIGGER t_atualiza_stock ON itens;--RESOLVER ESTE TRIGGER!!!
+DROP TRIGGER t_atualiza_stock ON itens;--TODO: RESOLVER ESTE TRIGGER!!!
 CREATE TRIGGER t_atualiza_stock
 BEFORE INSERT ON itens
 FOR EACH ROW

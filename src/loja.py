@@ -1069,6 +1069,7 @@ def see_notifications(user_id, type_user):
     cur = conn.cursor()
 
     try:
+        # TODO: ver sapenas as que nao foram vistas
         cur.execute('SELECT n.id, n.texto. n.data from notificacoes n WHERE n.utilizador_id = %s;',(user_id,))
         rows = cur.fetchall()
         results = []
@@ -1078,6 +1079,8 @@ def see_notifications(user_id, type_user):
             results.append(content)
 
         response = {'Status': StatusCodes['success'], 'Results': results}
+
+        # TODO: meter as notificacoes vista a true
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
