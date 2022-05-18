@@ -1,23 +1,18 @@
 
-CREATE OR REPLACE FUNCTION atualiza_stock()
-RETURNS TRIGGER 
-AS $$
-DECLARE
-    quant INTEGER;
-BEGIN
-    SELECT stock into quant from produtos where id = NEW.produto_id and versao = NEW.versao_produto;
-    if quant < NEW.quantidade then
-        raise exception 'Quantidade indisponivel em stock';
-    ELSE
-        update produtos set stock = stock - NEW.quantidade 
-        where id = NEW.produto_id and versao = NEW.versao_produto;
-    END IF;
-    RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
 DROP TRIGGER IF EXISTS t_atualiza_stock ON itens;--TODO: RESOLVER ESTE TRIGGER!!!
 CREATE TRIGGER t_atualiza_stock
 BEFORE INSERT ON itens
 FOR EACH ROW
 EXECUTE PROCEDURE atualiza_stock();
+
+DROP TRIGGER IF EXISTS t_notificacao_vendedor ON itens;
+CREATE TRIGGER t_notificacao_vendedor 
+AFTER INSERT ON itens
+FOR EACH ROW
+EXECUTE PROCEDURE notificacao_vendedor();
+
+DROP TRIGGER IF EXISTS t_notificacao_comprador ON compras;
+CREATE TRIGGER t_notificacao_comprador 
+AFTER UPDATE ON compras
+FOR EACH ROW
+EXECUTE PROCEDURE notificacao_comprador();

@@ -140,6 +140,68 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP FUNCTION atualiza_stock; 
+CREATE OR REPLACE FUNCTION atualiza_stock()
+RETURNS TRIGGER 
+AS $$
+DECLARE
+    quant INTEGER;
+BEGIN
+    SELECT stock into quant from produtos where id = NEW.produto_id and versao = NEW.versao_produto;
+    if quant < NEW.quantidade then
+        raise exception 'Quantidade indisponivel em stock';
+    ELSE
+        update produtos set stock = stock - NEW.quantidade --TODO: ver a cena do begin transaction
+        where id = NEW.produto_id and versao = NEW.versao_produto;
+    END IF;
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION notificacao_vendedor;
+CREATE OR REPLACE FUNCTION notificacao_vendedor()
+RETURNS TRIGGER
+AS $$
+DECLARE 
+mensagem varchar;
+id_comprador INT;
+    BEGIN
+
+    SELECT comprador_id INTO id_comprador FROM compras where compra_id = NEW.compra_id;
+
+    mensagem := concat('O user ',id_comprador,' comprou ',NEW.quantidade,' produto(s) com a referencia ',NEW.produto_id,'.');
+
+    INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,NEW.vendedor_id);
+    RETURN NEW;
+    END
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS notificacao_comprador;
+CREATE OR REPLACE FUNCTION notificacao_comprador()
+RETURNS TRIGGER
+AS $$
+DECLARE 
+cur CURSOR for select quantidade ,produto_id from itens WHERE compra_id = NEW.compra_id;
+mensagem varchar;
+
+row_item record;
+    BEGIN
+
+    mensagem := concat('Voce comprou ');
+    OPEN cur;
+    LOOP
+    FETCH cur into row_item;
+    exit when not found;
+    mensagem := concat(mensagem,row_item.quantidade,' produto(s) de id:',row_item.produto_id,', ');
+    end loop;
+    close cur;
+    mensagem := concat(mensagem,'e ficou num total de ',NEW.compra_valor,' euros.');
+
+    INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,NEW.comprador_id);
+    RETURN NEW;
+    END
+$$ LANGUAGE plpgsql;
+
 
 -- RATINGS ================================================================================================
 drop FUNCTION user_bought_product;

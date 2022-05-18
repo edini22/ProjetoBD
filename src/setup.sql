@@ -73,7 +73,7 @@ CREATE TABLE comentario(
 );
 CREATE TABLE notificacoes (
 	id SERIAL,
-	vista BOOL NOT NULL,
+	vista BOOL DEFAULT 'f',
 	data DATE NOT NULL,
 	texto	 VARCHAR(512) NOT NULL,
 	utilizador_id INTEGER NOT NULL,
