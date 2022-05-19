@@ -1,6 +1,6 @@
 -- Eliminar tableas se existirem
 DROP TABLE IF EXISTS admins;
-DROP TABLE IF EXISTS comentario;
+DROP TABLE IF EXISTS comentarios;
 DROP TABLE IF EXISTS computadores;
 DROP TABLE IF EXISTS televisoes;
 DROP TABLE IF EXISTS telemoveis;
@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS compradores;
 DROP TABLE IF EXISTS vendedores;
 DROP TABLE IF EXISTS notificacoes;
 DROP TABLE IF EXISTS utilizadores;
+
 -- Criar tabelas da DataBase
 CREATE TABLE produtos (
 	id BIGINT NOT NULL,
@@ -30,7 +31,6 @@ CREATE TABLE itens (
 	produto_id BIGINT,
 	versao_produto INTEGER NOT NULL,
 	vendedor_id INTEGER NOT NULL,
-	comprador_id INTEGER NOT NULL,--FIXME: VERIFICAR SE NAO É MELHOR RETIRAR!!
 	PRIMARY KEY(compra_id, produto_id,versao_produto)
 );
 CREATE TABLE ratings (
@@ -62,12 +62,11 @@ CREATE TABLE admins (
 	utilizador_id BIGINT UNIQUE,
 	PRIMARY KEY(utilizador_id)
 );
-CREATE TABLE comentario(
+CREATE TABLE comentarios(
 	id SERIAL,
 	texto VARCHAR(512) NOT NULL,
 	utilizador_id BIGINT NOT NULL,
 	comentario_pai_id BIGINT,
-	-- Retirei o Unique pq nao sei se ia afetar um comentario ter varias respostas por exemplo
 	produto_id BIGINT NOT NULL,
 	produto_versao	INTEGER NOT NULL,
 	PRIMARY KEY(id)
@@ -111,6 +110,7 @@ CREATE TABLE compras (
 	comprador_id BIGINT NOT NULL,
 	PRIMARY KEY(compra_id)
 );
+
 -- Adicionar as FK nas tabelas
 ALTER TABLE produtos
 ADD CONSTRAINT produtos_fk1 FOREIGN KEY (vendedor_id) REFERENCES vendedores(utilizador_id);
@@ -128,14 +128,12 @@ ALTER TABLE vendedores
 ADD CONSTRAINT vendedores_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
 ALTER TABLE admins
 ADD CONSTRAINT admins_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
-ALTER TABLE comentario
-ADD CONSTRAINT comentario_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
--- ALTER TABLE comentario_normal -- FIXME: alterei para como esta na linha abaixo
--- ADD CONSTRAINT comentario_normal_fk2 FOREIGN KEY (notificacao_normal_id) REFERENCES comentario_normal(notificacao_id);
-ALTER TABLE comentario
-ADD CONSTRAINT comentariol_fk2 FOREIGN KEY (comentario_pai_id) REFERENCES comentario(id);
-ALTER TABLE comentario
-ADD CONSTRAINT comentario_fk3 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
+ALTER TABLE comentarios
+ADD CONSTRAINT comentarios_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizadores(id);
+ALTER TABLE comentarios
+ADD CONSTRAINT comentarios_fk2 FOREIGN KEY (comentario_pai_id) REFERENCES comentarios(id);
+ALTER TABLE comentarios
+ADD CONSTRAINT comentarios_fk3 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
 ALTER TABLE televisoes
 ADD CONSTRAINT televisoes_fk1 FOREIGN KEY (produto_id,produto_versao) REFERENCES produtos(id,versao);
 ALTER TABLE telemoveis

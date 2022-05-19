@@ -6,7 +6,7 @@ SELECT * FROM admins;
 SELECT * FROM produtos;
 SELECT * FROM televisoes;
 
-SELECT * from comentario;
+SELECT * from comentarios;
 
 SELECT * from compras;
 
@@ -28,3 +28,5 @@ SELECT notificacao_vista(3);
 SELECT * FROM itens;
 
 SELECT produto_id ,produto_versao  FROM ratings where produto_id = 1;
+
+SELECT MAX(i.versao_produto)  FROM itens i ,compras c WHERE i.compra_id = c.compra_id and i.produto_id = 1 and c.comprador_id = 3;

@@ -4,7 +4,7 @@
 --TODO: FAZER PROTECOES PARA VER SE ESSE PRODUTO AO INSERIR JA EXISTE!!!!
 
 --retorna tipo de user se existir
-DROP FUNCTION LOGIN_VERIFY;
+DROP FUNCTION IF EXISTS LOGIN_VERIFY CASCADE;
 CREATE OR REPLACE FUNCTION LOGIN_VERIFY(US VARCHAR,pass VARCHAR)
 RETURNS VARCHAR
 AS
@@ -42,7 +42,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Devolve o tipo do produto atraves do user
-DROP FUNCTION GET_TIPO;
+DROP FUNCTION IF EXISTS GET_TIPO CASCADE;
 CREATE OR REPLACE FUNCTION GET_TIPO(ID_PRODUTO INT)
 RETURNS VARCHAR
 AS
@@ -82,7 +82,7 @@ $$ LANGUAGE plpgsql;
 
 --COMPRA============================================================================ CURRENT_DATE
 
-DROP FUNCTION get_preco;
+DROP FUNCTION IF EXISTS get_preco CASCADE;
 CREATE FUNCTION get_preco(produtoID INT)
 RETURNS float
 AS
@@ -98,7 +98,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-DROP FUNCTION add_compra; 
+DROP FUNCTION IF EXISTS add_compra CASCADE; 
 CREATE  FUNCTION add_compra(js json ,Id_comprador INTEGER)
 RETURNS VOID
 AS
@@ -129,7 +129,7 @@ BEGIN
         SELECT p.vendedor_id into vendedor  FROM produtos p where p.id = id_produto;
         SELECT MAX(p.versao) into versao FROM produtos p where p.id = id_produto;
         --RAISE NOTICE 'quantidade - % , compra_id - %,produto_id - %,versao - %,vendedor- %',quant,idd,id_produto,versao , vendedor ;
-        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id,comprador_id) VALUES (quant,idd,id_produto,versao , vendedor,Id_comprador );
+        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id) VALUES (quant,idd,id_produto,versao , vendedor);
 
 
     END LOOP;
@@ -139,8 +139,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION atualiza_stock; 
-CREATE OR REPLACE FUNCTION atualiza_stock()
+DROP FUNCTION IF EXISTS atualiza_stock CASCADE; 
+CREATE FUNCTION atualiza_stock()
 RETURNS TRIGGER 
 AS $$
 DECLARE
@@ -148,7 +148,7 @@ DECLARE
 BEGIN
     SELECT stock into quant from produtos where id = NEW.produto_id and versao = NEW.versao_produto;
     if quant < NEW.quantidade then
-        raise exception 'Quantidade indisponivel em stock';
+        raise exception 'Quantidade indisponivel em stock  -  ';
     ELSE
         update produtos set stock = stock - NEW.quantidade --TODO: ver a cena do begin transaction
         where id = NEW.produto_id and versao = NEW.versao_produto;
@@ -157,22 +157,24 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION notificacao_vendedor;
+DROP FUNCTION IF EXISTS notificacao_vendedor CASCADE;
 CREATE OR REPLACE FUNCTION notificacao_vendedor()
 RETURNS TRIGGER
 AS $$
 DECLARE 
 mensagem varchar;
+id_comprador INT;
     BEGIN
 
-    mensagem := concat('O user ',NEW.comprador_id,' comprou ',NEW.quantidade,' produto(s) com a referencia ',NEW.produto_id,'.');
+    SELECT comprador_id INTO id_comprador FROM compras where compra_id = NEW.compra_id;
+    mensagem := concat('O user ',id_comprador,' comprou ',NEW.quantidade,' produto(s) com a referencia ',NEW.produto_id,'.');
 
     INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,NEW.vendedor_id);
     RETURN NEW;
     END
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION IF EXISTS notificacao_comprador;
+DROP FUNCTION IF EXISTS notificacao_comprador CASCADE;
 CREATE OR REPLACE FUNCTION notificacao_comprador()
 RETURNS TRIGGER
 AS $$
@@ -200,7 +202,7 @@ $$ LANGUAGE plpgsql;
 
 
 -- RATINGS ================================================================================================
-drop FUNCTION user_bought_product;
+drop FUNCTION IF EXISTS user_bought_product CASCADE;
 CREATE  FUNCTION user_bought_product(comprador INT, produto INTEGER)
 RETURNS INT
 AS
@@ -209,9 +211,9 @@ DECLARE
     resultado INT;
     versao INT := 0;
 BEGIN
-    SELECT i.versao_produto INTO versao FROM itens i 
-    WHERE i.comprador_id = comprador AND i.produto_id = produto
-    ORDER BY i.versao_produto DESC;
+
+    SELECT MAX(i.versao_produto) into  versao  FROM itens i ,compras c WHERE i.compra_id = c.compra_id and i.produto_id = produto and c.comprador_id = comprador;
+
     IF versao <= 0 THEN
         resultado = 0;
     ELSE resultado = versao;
@@ -220,7 +222,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-drop function add_rating;
+drop function IF EXISTS add_rating CASCADE;
 CREATE FUNCTION add_rating(valor INT, comentario VARCHAR, comprador INT, produto INT, versao INT)
 RETURNS VOID
 AS
@@ -231,7 +233,7 @@ DECLARE
 END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION IF EXISTS notificacao_vendedor_rating;
+DROP FUNCTION IF EXISTS notificacao_vendedor_rating CASCADE;
 CREATE OR REPLACE FUNCTION notificacao_vendedor_rating()
 RETURNS TRIGGER
 AS $$
@@ -244,7 +246,7 @@ v_produto INT;
 
     --OBTER id do vendedor do produto
     SELECT produto_id, produto_versao INTO id_produto, v_produto FROM ratings where produto_id = NEW.produto_id;
-    SELECT vendedor_id INTO id_vendedor FROM produtos where id = id_produto and versao = versao_produto;
+    SELECT vendedor_id INTO id_vendedor FROM produtos where id = id_produto and versao = v_produto;
 
     mensagem := concat('O user ',NEW.comprador_id,' avaliou o produto com id ',NEW.produto_id,' com ',NEW.valor,' estrela(s) e comentou: ',NEW.comentario,'.');
 
@@ -254,28 +256,61 @@ v_produto INT;
 $$ LANGUAGE plpgsql;
 
 -- COMENTARIOS ============================================================================================
-drop function add_comentario1;
+drop function IF EXISTS add_comentario1 CASCADE;
 CREATE  FUNCTION add_comentario1(texto VARCHAR, utilizador INT, produto INT)
 RETURNS VOID
 AS
 $$
 DECLARE
 BEGIN
-    INSERT INTO comentario (texto, utilizador_id, produto_id, produto_versao) VALUES (texto, utilizador, produto, max_versao(produto));
+    INSERT INTO comentarios (texto, utilizador_id, produto_id, produto_versao) VALUES (texto, utilizador, produto, max_versao(produto));
 
 END;
 $$ LANGUAGE plpgsql;
 
-drop function add_comentario2;
+drop function IF EXISTS add_comentario2 CASCADE;
 CREATE  FUNCTION add_comentario2(texto VARCHAR, utilizador INT, produto INT, comentario_pai INT)
 RETURNS VOID
 AS
 $$
 DECLARE
 BEGIN
-    INSERT INTO comentario (texto, utilizador_id, produto_id, comentario_pai_id, produto_versao) VALUES (texto, utilizador, produto, comentario_pai, max_versao(produto));
+    INSERT INTO comentarios (texto, utilizador_id, produto_id, comentario_pai_id, produto_versao) VALUES (texto, utilizador, produto, comentario_pai, max_versao(produto));
 
 END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS notificacao_comentario CASCADE;
+CREATE OR REPLACE FUNCTION notificacao_comentario()
+RETURNS TRIGGER
+AS $$
+DECLARE 
+mensagem varchar;
+id_coment_pai INT;
+id_produto INT; 
+v_produto INT;
+id_vendedor INT;
+    BEGIN
+
+    SELECT comentario_pai_id into id_coment_pai FROM comentarios WHERE id = NEW.id;
+
+    IF id_coment_pai = NULL THEN
+        --OBTER id do vendedor do produto
+        SELECT produto_id, produto_versao INTO id_produto, v_produto FROM ratings where produto_id = NEW.produto_id;
+        SELECT vendedor_id INTO id_vendedor FROM produtos where id = id_produto and versao = v_produto;
+
+        mensagem := concat('O user ',NEW.utilizador_id,' comentou o produto com id ',NEW.produto_id,'.');
+
+        INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,id_vendedor);
+    ELSE
+        SELECT utilizador_id into id_vendedor FROM comentarios WHERE id = id_coment_pai;
+
+        mensagem := concat('O user ',NEW.utilizador_id,' respondeu ao seu comentario de id',id_coment_pai,'.');
+        INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,id_vendedor);
+    END IF;
+
+    RETURN NEW;
+    END
 $$ LANGUAGE plpgsql;
 
 -- NOTIFICACOES ==============================================================================================================
@@ -295,7 +330,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION IF EXISTS notificacao_vista;
+DROP FUNCTION IF EXISTS notificacao_vista CASCADE;
 CREATE OR REPLACE FUNCTION notificacao_vista(User_idd INT)
 RETURNS VOID
 AS $$
@@ -324,7 +359,7 @@ $$ LANGUAGE plpgsql;
 -- Devolve o id do produto dando o seu nome e o id do vendedor
     --QUESTION: Se por quealquer razao se colocar mos a guardo o historico da ram, etc de um produto teremos que colocar a busca pela versao tb
 -- TODO: 
-DROP FUNCTION ID_PRODUTO;
+DROP FUNCTION IF EXISTS ID_PRODUTO CASCADE;
 CREATE OR REPLACE FUNCTION ID_PRODUTO(string VARCHAR, vendedor INT)
 RETURNS INT
 AS
@@ -371,7 +406,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um computador
-DROP FUNCTION add_computador;      
+DROP FUNCTION IF EXISTS add_computador CASCADE;      
 CREATE  FUNCTION add_computador(id_produto INT,Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
 RETURNS void
 AS
@@ -384,7 +419,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um telemovel
-DROP FUNCTION add_telemovel; 
+DROP FUNCTION IF EXISTS add_telemovel CASCADE; 
 CREATE  FUNCTION add_telemovel(id_produto INT,Versao INT,Nome_telemovel VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Ram INTEGER,Rom INTEGER)
 RETURNS void
 AS
@@ -397,7 +432,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere uma televisao
-DROP FUNCTION add_televisao; 
+DROP FUNCTION IF EXISTS add_televisao CASCADE; 
 CREATE  FUNCTION add_televisao(id_produto INT,Versao INT,Nometv VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Resolucao INTEGER)
 RETURNS void
 AS

@@ -137,7 +137,7 @@ def verify_token_login(f):
 
 
 # http://localhost:8080/user/
-@app.route('/user/', methods=['PUT'])
+@app.route('/user', methods=['PUT'])
 def signIn():
     """Login do utilizador"""
     logger.info('PUT /user/')
@@ -194,7 +194,7 @@ def signIn():
 # apenas admins adicionam admins e vendedores
 
 
-@app.route('/user/', methods=['POST'])
+@app.route('/user', methods=['POST'])
 @verify_token_login
 def new_user(type_user):
     logger.info('POST /user')
@@ -291,7 +291,7 @@ def new_user(type_user):
 # http://localhost:8080/produtos/
 
 
-@app.route('/produtos/', methods=['GET'])
+@app.route('/produtos', methods=['GET'])
 def get_all_produts():
     logger.info('GET /produtos')
     conn = db_connection()
@@ -355,7 +355,7 @@ def get_all_produts():
 
 # http://localhost:8080/utilizadores/
 
-@app.route('/utilizadores/', methods=['GET'])
+@app.route('/utilizadores', methods=['GET'])
 @verify_token
 def get_all_users(user_id, type_user):
     logger.info('GET /utilizadores')
@@ -397,7 +397,7 @@ def get_all_users(user_id, type_user):
 
 # http://localhost:8080/compradores/
 
-@app.route('/compradores/', methods=['GET'])
+@app.route('/compradores', methods=['GET'])
 @verify_token
 def get_all_buyers(user_id, type_user):
     logger.info('GET /compradores')
@@ -441,7 +441,7 @@ def get_all_buyers(user_id, type_user):
 
 # http://localhost:8080/vendedores/
 
-@app.route('/vendedores/', methods=['GET'])
+@app.route('/vendedores', methods=['GET'])
 @verify_token
 def get_all_sellers(user_id, type_user):
     logger.info('GET /vendedores')
@@ -491,7 +491,7 @@ def get_all_sellers(user_id, type_user):
 # Produtos =======================================================================
 
 # http://localhost:8080/produto/
-@app.route('/produto/', methods=['POST'])
+@app.route('/produto', methods=['POST'])
 @verify_token
 def new_product(user_id, type_user):
     logger.info('POST /produto')
@@ -787,7 +787,7 @@ def change_product(user_id, type_user, produto_id):
 
 # http://localhost:8080/order
 
-@app.route('/compra/', methods=['POST'])
+@app.route('/compra', methods=['POST'])
 @verify_token
 def order(user_id, type_user):
     logger.info('POST /compra')
@@ -1044,7 +1044,7 @@ def see_comments(produto_id):
 
     try:
         cur.execute(
-            'SELECT c.id, c.texto, c.utilizador_id, c.comentario_pai_id FROM comentario c WHERE c.produto_id = %s ORDER BY c.comentario_pai_id ASC', produto_id)
+            'SELECT c.id, c.texto, c.utilizador_id, c.comentario_pai_id FROM comentarios c WHERE c.produto_id = %s ORDER BY c.comentario_pai_id ASC', produto_id)
         rows = cur.fetchall()
 
         logger.debug('GET /comentario - parse')
@@ -1083,7 +1083,7 @@ def see_comments(produto_id):
 
 # http://localhost:8080/notificacoes/
 
-@app.route('/notificacoes/', methods=['GET'])
+@app.route('/notificacoes', methods=['GET'])
 @verify_token
 def see_notifications(user_id, type_user):
     logger.info(f'GET /notificacoes/')
@@ -1120,6 +1120,7 @@ def see_notifications(user_id, type_user):
 
 # =============================================================================================================
 
+# in psql , you can run “ \set AUTOCOMMIT off ”
 
 if __name__ == '__main__':
     db = db_connection()
