@@ -510,3 +510,51 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Devolve o tipo do produto atraves do user
+-- DROP FUNCTION IF EXISTS GET_PRODUCT CASCADE;
+-- CREATE OR REPLACE FUNCTION GET_PRODUCT(ID_PRODUTO INT)
+-- RETURNS json
+-- AS
+-- $$
+-- DECLARE
+--     idd INT :=-1;
+--     js json ;
+--     cur CURSOR for SELECT p.preco,p.versao FROM produtos p WHERE p.id = ID_PRODUTO ORDER BY p.versao DESC;
+--     row_item record;
+--     nam VARCHAR;
+--     descr VARCHAR;
+--     sto INT;
+--     m_versao INT;
+-- BEGIN 
+
+--     SELECT p.id INTO idd FROM produtos p WHERE p.id = ID_PRODUTO;
+--     IF idd > 0  THEN
+--         SELECT MAX(p.versao) INTO m_versao FROM produtos p WHERE p.id = ID_PRODUTO;
+--         SELECT p.nome, p.descricao, p.stock INTO  nam,descr,sto FROM produtos p WHERE p.id = ID_PRODUTO and p.versao = m_versao;
+--         json_modify(js,'$.nome',nam);
+--         SET js = json_modify(js,'$.descricao',descr);
+--         SET js = json_modify(js,'$.stock',sto);
+--         SET js = JSON_MODIFY(js,'$.preço',[])
+--         js:={'nome':nam,'descricao':descr,'stock': sto,'preco':[],'comentarios':[],}
+--         OPEN cur;
+--         LOOP
+--         FETCH cur into row_item;
+--         exit when not found;
+--         IF row_item.versao = m_versao THEN
+--             SET js = JSON_MODIFY(js,'append $.preço','current_price : %',row_item.preco);
+--         ELSE
+--             SET js = JSON_MODIFY(js,'append $.preço','prev_price : %',row_item.preco);
+--         END IF;
+
+--         end loop;
+--         close cur;
+
+
+--     ELSE THEN 
+--          SET js = json_modify(js,'$.erro','nao existe nenhum produto com esse id');
+--     END IF;
+
+--     RETURN js;
+-- END;
+-- $$ LANGUAGE plpgsql;
+

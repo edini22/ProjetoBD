@@ -34,3 +34,5 @@ SELECT MAX(i.versao_produto)  FROM itens i ,compras c WHERE i.compra_id = c.comp
 SELECT comentario_pai_id  FROM comentarios WHERE id = 1;
 
 SELECT utilizador_id FROM comentarios WHERE id = 6;
+
+SELECT p.id  FROM produtos p WHERE p.id = 1 ORDER BY p.versao DESC;

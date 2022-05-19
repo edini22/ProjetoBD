@@ -1,4 +1,3 @@
-from urllib import response
 from flask import Flask, request, jsonify
 import datetime
 from functools import wraps
@@ -40,8 +39,6 @@ def db_connection():
     return db
 
 # ENDPOINTS =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-
-# FIXME: verificar os endpoints onde esta dbproj
 
 
 @app.route('/')
@@ -136,17 +133,17 @@ def verify_token_login(f):
     return decorator
 
 
-# http://localhost:8080/user/
-@app.route('/user', methods=['PUT'])
+# http://localhost:8080/dbproj/user
+@app.route('/dbproj/user', methods=['PUT'])
 def signIn():
     """Login do utilizador"""
-    logger.info('PUT /user/')
+    logger.info('PUT /dbproj/user')
     payload = flask.request.get_json()
 
     conn = db_connection()
     cur = conn.cursor()
 
-    logger.debug(f'PUT /user/ - payload: {payload}')
+    logger.debug(f'PUT /dbproj/user/ - payload: {payload}')
 
     if 'username' not in payload:
         response = {'status': StatusCodes['api_error'],
@@ -162,7 +159,7 @@ def signIn():
     values = (payload['username'], payload['password'])
 
     try:
-        res = cur.execute(statement, values)
+        cur.execute(statement, values)
         row = cur.fetchall()
         if row[0][0] == "ERRO":
             response = {'status': StatusCodes['api_error'],
@@ -171,7 +168,6 @@ def signIn():
         else:
             cur.execute('SELECT ID_USER(%s)', (payload['username'],))
             rows = cur.fetchall()
-            print(rows[0][0])
             token = generate_token(str(rows[0][0]), str(row[0][0]))
             conn.commit()
             return flask.jsonify({'authToken': token})
@@ -189,15 +185,15 @@ def signIn():
 
     return flask.jsonify(response)
 
-# http://localhost:8080/user/
+# http://localhost:8080/dbproj/user
 # qualquer um pode se registar como comprador
 # apenas admins adicionam admins e vendedores
 
 
-@app.route('/user', methods=['POST'])
+@app.route('/dbproj/user', methods=['POST'])
 @verify_token_login
 def new_user(type_user):
-    logger.info('POST /user')
+    logger.info('POST /dbproj/user')
     payload = flask.request.get_json()
 
     # Verificar todos os parametros para adicionar user
@@ -255,6 +251,8 @@ def new_user(type_user):
 
     conn = db_connection()
     cur = conn.cursor()
+
+    logger.debug(f'POST /dbproj/user - payload: {payload}')
     try:
         if(payload['tipo'] == "admin"):
             valuesadmin = (payload['username'],
@@ -269,8 +267,9 @@ def new_user(type_user):
                           payload['nome'], int(payload['nif']))
             cur.execute(addvend, valuesvend)
         tipo = payload['tipo']
+        nome = payload['username']
         reponse = {'Status': StatusCodes['success'],
-                   'Results': f'{tipo} inserido!'}
+                   'Results': f'{tipo} inserido!{nome}'}
 
         conn.commit()
 
@@ -288,12 +287,12 @@ def new_user(type_user):
 
 # GET's ==========================================================================
 
-# http://localhost:8080/produtos/
+# http://localhost:8080/dbproj/produtos
 
 
-@app.route('/produtos', methods=['GET'])
+@app.route('/dbproj/produtos', methods=['GET'])
 def get_all_produts():
-    logger.info('GET /produtos')
+    logger.info('GET /dbproj/produtos')
     conn = db_connection()
     cur = conn.cursor()
 
@@ -353,16 +352,16 @@ def get_all_produts():
     return flask.jsonify(reponse)
 
 
-# http://localhost:8080/utilizadores/
+# http://localhost:8080/dbproj/utilizadores
 
-@app.route('/utilizadores', methods=['GET'])
+@app.route('/dbproj/utilizadores', methods=['GET'])
 @verify_token
 def get_all_users(user_id, type_user):
-    logger.info('GET /utilizadores')
+    logger.info('GET /dbproj/utilizadores')
 
     # Verficar permissoes
     if(type_user == "comprador"):
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
         return jsonify(response)
 
@@ -381,26 +380,26 @@ def get_all_users(user_id, type_user):
             content = {'Nome': row[0], 'ID': int(row[1]), 'Username': row[2]}
             Results.append(content)
 
-        reponse = {'Status': StatusCodes['success'], 'results': Results}
+        response = {'Status': StatusCodes['success'], 'results': Results}
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /utilizadores - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': str(error)}
 
     finally:
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 
-# http://localhost:8080/compradores/
+# http://localhost:8080/dbproj/compradores
 
-@app.route('/compradores', methods=['GET'])
+@app.route('/dbproj/compradores', methods=['GET'])
 @verify_token
 def get_all_buyers(user_id, type_user):
-    logger.info('GET /compradores')
+    logger.info('GET /dbproj/compradores')
 
     # Verficar permissoes
     if(type_user == "comprador"):
@@ -439,12 +438,12 @@ def get_all_buyers(user_id, type_user):
     return flask.jsonify(reponse)
 
 
-# http://localhost:8080/vendedores/
+# http://localhost:8080/dbproj/vendedores
 
-@app.route('/vendedores', methods=['GET'])
+@app.route('/dbproj/vendedores', methods=['GET'])
 @verify_token
 def get_all_sellers(user_id, type_user):
-    logger.info('GET /vendedores')
+    logger.info('GET /dbproj/vendedores')
 
     # Verficar permissoes
     if(type_user == "comprador"):
@@ -490,11 +489,11 @@ def get_all_sellers(user_id, type_user):
 
 # Produtos =======================================================================
 
-# http://localhost:8080/produto/
-@app.route('/produto', methods=['POST'])
+# http://localhost:8080/dbproj/product
+@app.route('/dbproj/product', methods=['POST'])
 @verify_token
 def new_product(user_id, type_user):
-    logger.info('POST /produto')
+    logger.info('POST /dbproj/product')
     payload = flask.request.get_json()
 
     # Verficar permissoes
@@ -581,6 +580,8 @@ def new_product(user_id, type_user):
 
     conn = db_connection()
     cur = conn.cursor()
+
+    logger.debug(f'POST /dbproj/product - payload: {payload}')
     try:
         cur.execute('SELECT max_id();')
         idd = int(cur.fetchall()[0][0])+1
@@ -622,11 +623,11 @@ def new_product(user_id, type_user):
     return flask.jsonify(reponse)
 
 
-# http://localhost:8080/produtos/{produto_id}
-@app.route('/produtos/<produto_id>', methods=['PUT'])
+# http://localhost:8080/dbproj/product/{product_id}
+@app.route('/dbproj/product/<produto_id>', methods=['PUT'])
 @verify_token
 def change_product(user_id, type_user, produto_id):
-    logger.info('PUT /poduto/<produto_id>')
+    logger.info('PUT /dbproj/product/<produto_id>')
     payload = flask.request.get_json()
 
     # Verificar permissoes
@@ -649,6 +650,9 @@ def change_product(user_id, type_user, produto_id):
 
     conn = db_connection()
     cur = conn.cursor()
+
+    logger.debug(f'PUT /dbproj/product/{produto_id} - payload: {payload}')
+
     try:
         # Verificar se o user é vendedor do produto
         cur.execute(
@@ -785,12 +789,12 @@ def change_product(user_id, type_user, produto_id):
 
 # Compra =========================================================================
 
-# http://localhost:8080/order
+# http://localhost:8080/dbproj/order
 
-@app.route('/compra', methods=['POST'])
+@app.route('/dbproj/order', methods=['POST'])
 @verify_token
 def order(user_id, type_user):
-    logger.info('POST /compra')
+    logger.info('POST /dbproj/order')
     payload = flask.request.get_json()
 
     if(type_user != "comprador"):
@@ -823,6 +827,9 @@ def order(user_id, type_user):
 
     conn = db_connection()
     cur = conn.cursor() 
+
+    logger.debug(f'POST /dbproj/order - payload: {payload}')
+
     try:
         cur.execute(add, values)
         reponse = {'Status': StatusCodes['success'],
@@ -845,12 +852,12 @@ def order(user_id, type_user):
 
 # Rating =========================================================================
 
-# http://localhost:8080/ratings/{produto_id}
+# http://localhost:8080/dbproj/rating/{product_id}
 
-@app.route('/ratings/<produto_id>', methods=['POST'])
+@app.route('/dbproj/rating/<produto_id>', methods=['POST'])
 @verify_token
 def rating(user_id, type_user, produto_id):
-    logger.info(f'POST /ratings/{produto_id}')
+    logger.info(f'POST /dbproj/rating/{produto_id}')
     payload = flask.request.get_json()
 
     if type_user != 'comprador':
@@ -877,6 +884,8 @@ def rating(user_id, type_user, produto_id):
 
     conn = db_connection()
     cur = conn.cursor()
+
+    logger.debug(f'POST /dbproj/rating/{produto_id} - payload: {payload}')
 
     try:
         statement = "SELECT user_bought_product(%s,%s)"
@@ -913,11 +922,11 @@ def rating(user_id, type_user, produto_id):
     return flask.jsonify(response)
 
 
-# http://localhost:8080/ratings/{produto_id}
+# http://localhost:8080/dbproj/rating/{product_id}
 
-@app.route('/ratings/<produto_id>', methods=['GET'])
+@app.route('/dbproj/rating/<produto_id>', methods=['GET'])
 def see_ratings(produto_id):
-    logger.info(f'GET /ratings/{produto_id}')
+    logger.info(f'GET /dbproj/rating/{produto_id}')
 
     conn = db_connection()
     cur = conn.cursor()
@@ -953,12 +962,12 @@ def see_ratings(produto_id):
 
 
 # Comentario =====================================================================
-# http://localhost:8080/comentario/{produto_id}
+# http://localhost:8080/dbproj/questions/{product_id}
 
-@app.route('/comentario/<produto_id>', methods=['POST'])
+@app.route('/dbproj/questions/<produto_id>', methods=['POST'])
 @verify_token
 def comment1(user_id, type_user, produto_id):
-    logger.info(f'POST /comentario_normal/{produto_id}')
+    logger.info(f'POST /dbproj/questions/{produto_id}')
     payload = flask.request.get_json()
 
     if 'texto' not in payload:
@@ -968,6 +977,8 @@ def comment1(user_id, type_user, produto_id):
 
     conn = db_connection()
     cur = conn.cursor()
+
+    logger.debug(f'POST /dbproj/questions/{produto_id} - payload: {payload}')
 
     try:
         statement = 'SELECT add_comentario1(%s, %s, %s)'
@@ -993,12 +1004,12 @@ def comment1(user_id, type_user, produto_id):
     return flask.jsonify(response)
 
 
-# http://localhost:8080/comentario/{produto_id}/{comentario_pai}
+# http://localhost:8080/dbproj/questions/{product_id}/{parent_question_id}
 
-@app.route('/comentario/<produto_id>/<comentario_pai_id>', methods=['POST'])
+@app.route('/dbproj/questions/<product_id>/<parent_question_id>', methods=['POST'])
 @verify_token
 def comment2(user_id, type_user, produto_id, comentario_pai_id):
-    logger.info(f'POST /comentario_normal/{produto_id}')
+    logger.info(f'POST /dbproj/questions/{produto_id}/{comentario_pai_id}')
     payload = flask.request.get_json()
 
     if 'texto' not in payload:
@@ -1008,6 +1019,8 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
 
     conn = db_connection()
     cur = conn.cursor()
+
+    logger.debug(f'POST /dbproj/questions/{produto_id}/{comentario_pai_id} - payload: {payload}')
 
     try:
         statement = 'SELECT add_comentario2(%s, %s, %s, %s)'
@@ -1033,11 +1046,11 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
     return flask.jsonify(response)
 
 
-# http://localhost:8080/comentarios/{produto_id}
+# http://localhost:8080/dbproj/questions/{product_id}
 
-@app.route('/comentarios/<produto_id>', methods=['GET'])
+@app.route('/dbproj/questions/<produto_id>', methods=['GET'])
 def see_comments(produto_id):
-    logger.info(f'GET /comentario/{produto_id}')
+    logger.info(f'GET /dbproj/questions/{produto_id}')
 
     conn = db_connection()
     cur = conn.cursor()
@@ -1047,7 +1060,7 @@ def see_comments(produto_id):
             'SELECT c.id, c.texto, c.utilizador_id, c.comentario_pai_id FROM comentarios c WHERE c.produto_id = %s ORDER BY c.comentario_pai_id ASC', produto_id)
         rows = cur.fetchall()
 
-        logger.debug('GET /comentario - parse')
+        logger.debug('GET /dbproj/comentario - parse')
         Results = []
         for row in rows:
             idd = row[0]
@@ -1081,12 +1094,12 @@ def see_comments(produto_id):
     return flask.jsonify(response)
 
 
-# http://localhost:8080/notificacoes/
+# http://localhost:8080/dbproj/notificacoes
 
-@app.route('/notificacoes', methods=['GET'])
+@app.route('/dbproj/notificacoes', methods=['GET'])
 @verify_token
 def see_notifications(user_id, type_user):
-    logger.info(f'GET /notificacoes/')
+    logger.info(f'GET /dbproj/notificacoes/')
 
     conn = db_connection()
     cur = conn.cursor()
@@ -1110,6 +1123,53 @@ def see_notifications(user_id, type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return flask.jsonify(response)
+
+
+# http://localhost:8080/dbproj/product/{product_id}
+@app.route('/dbproj/product/<produto_id>', methods=['GET'])
+def get_product(produto_id):
+    logger.info(f'GET /dbproj/product/{produto_id}')
+
+    
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('GET_PRODUCT(%s)', produto_id)
+        rows = cur.fetchall()
+
+        logger.debug('GET /comentario - parse')
+        Results = []
+        for row in rows:
+            idd = row[0]
+            texto = row[1]
+            utilizador = row[2]
+            comentario_pai = row[3]
+            logger.debug(row)
+
+            if comentario_pai == None:
+                content = {'ID': int(idd), 'Texto': texto,
+                           'Utilizador': utilizador}
+            else:
+                content = {'ID': int(
+                    idd), 'Texto': texto, 'Utilizador': utilizador, 'ID Comentario pai': comentario_pai}
+            Results.append(content)
+
+        response = {'Status': StatusCodes['success'], 'results': Results}
+
+        conn.commit()
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
