@@ -30,3 +30,7 @@ SELECT * FROM itens;
 SELECT produto_id ,produto_versao  FROM ratings where produto_id = 1;
 
 SELECT MAX(i.versao_produto)  FROM itens i ,compras c WHERE i.compra_id = c.compra_id and i.produto_id = 1 and c.comprador_id = 3;
+
+SELECT comentario_pai_id  FROM comentarios WHERE id = 1;
+
+SELECT utilizador_id FROM comentarios WHERE id = 6;

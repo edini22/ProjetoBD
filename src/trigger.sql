@@ -18,6 +18,7 @@ AFTER INSERT ON ratings
 FOR EACH ROW
 EXECUTE PROCEDURE notificacao_vendedor_rating();
 
+ 
 CREATE TRIGGER t_notificacao_comentario 
 AFTER INSERT ON comentarios
 FOR EACH ROW

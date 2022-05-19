@@ -294,16 +294,16 @@ id_vendedor INT;
 
     SELECT comentario_pai_id into id_coment_pai FROM comentarios WHERE id = NEW.id;
 
-    IF id_coment_pai = NULL THEN
+    IF id_coment_pai is NULL THEN
         --OBTER id do vendedor do produto
-        SELECT produto_id, produto_versao INTO id_produto, v_produto FROM ratings where produto_id = NEW.produto_id;
+        SELECT produto_id, produto_versao INTO id_produto, v_produto FROM comentarios where produto_id = NEW.produto_id;
         SELECT vendedor_id INTO id_vendedor FROM produtos where id = id_produto and versao = v_produto;
 
         mensagem := concat('O user ',NEW.utilizador_id,' comentou o produto com id ',NEW.produto_id,'.');
 
         INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,id_vendedor);
     ELSE
-        SELECT utilizador_id into id_vendedor FROM comentarios WHERE id = id_coment_pai;
+       SELECT utilizador_id into id_vendedor FROM comentarios WHERE id = id_coment_pai;
 
         mensagem := concat('O user ',NEW.utilizador_id,' respondeu ao seu comentario de id',id_coment_pai,'.');
         INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,id_vendedor);
