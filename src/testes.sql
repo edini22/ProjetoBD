@@ -23,5 +23,8 @@ SELECT add_compra('[
     ',3);
 
 SELECT * FROM notificacoes;
+SELECT notificacao_vista(3);
 
 SELECT * FROM itens;
+
+SELECT produto_id ,produto_versao  FROM ratings where produto_id = 1;

@@ -16,3 +16,9 @@ CREATE TRIGGER t_notificacao_comprador
 AFTER UPDATE ON compras
 FOR EACH ROW
 EXECUTE PROCEDURE notificacao_comprador();
+
+DROP TRIGGER IF EXISTS t_notificacao_vendedor_rating ON compras;
+CREATE TRIGGER t_notificacao_vendedor_rating 
+AFTER UPDATE ON ratings
+FOR EACH ROW
+EXECUTE PROCEDURE notificacao_vendedor_rating();

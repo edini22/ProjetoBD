@@ -113,7 +113,6 @@ DECLARE
     vendedor INT;
     versao INT;
 BEGIN
-    --LOOP COM O JSON   #
     --VERIFICAR SE EXISTE ESSE PRODUTO !!
     INSERT INTO compras (compra_valor,compra_data,comprador_id) VALUES (0,CURRENT_DATE,Id_comprador);
     SELECT compra_id INTO idd FROM compras WHERE compra_valor = 0 and compra_data = CURRENT_DATE and comprador_id = Id_comprador;
@@ -130,7 +129,7 @@ BEGIN
         SELECT p.vendedor_id into vendedor  FROM produtos p where p.id = id_produto;
         SELECT MAX(p.versao) into versao FROM produtos p where p.id = id_produto;
         --RAISE NOTICE 'quantidade - % , compra_id - %,produto_id - %,versao - %,vendedor- %',quant,idd,id_produto,versao , vendedor ;
-        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id) VALUES (quant,idd,id_produto,versao , vendedor );
+        INSERT INTO itens (quantidade,compra_id,produto_id,versao_produto,vendedor_id,comprador_id) VALUES (quant,idd,id_produto,versao , vendedor,Id_comprador );
 
 
     END LOOP;
@@ -164,12 +163,9 @@ RETURNS TRIGGER
 AS $$
 DECLARE 
 mensagem varchar;
-id_comprador INT;
     BEGIN
 
-    SELECT comprador_id INTO id_comprador FROM compras where compra_id = NEW.compra_id;
-
-    mensagem := concat('O user ',id_comprador,' comprou ',NEW.quantidade,' produto(s) com a referencia ',NEW.produto_id,'.');
+    mensagem := concat('O user ',NEW.comprador_id,' comprou ',NEW.quantidade,' produto(s) com a referencia ',NEW.produto_id,'.');
 
     INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,NEW.vendedor_id);
     RETURN NEW;
@@ -213,10 +209,10 @@ DECLARE
     resultado INT;
     versao INT := 0;
 BEGIN
-    SELECT produto_versao INTO versao FROM itens i 
-    WHERE i.comprador_id = comprador AND i.produto = produto
-    ORDER BY i.produto_versao DESC;
-    IF idd <= 0 THEN
+    SELECT i.versao_produto INTO versao FROM itens i 
+    WHERE i.comprador_id = comprador AND i.produto_id = produto
+    ORDER BY i.versao_produto DESC;
+    IF versao <= 0 THEN
         resultado = 0;
     ELSE resultado = versao;
     END IF;
@@ -233,6 +229,28 @@ DECLARE
     BEGIN
         INSERT INTO ratings (valor, comentario, comprador_id, produto_id, produto_versao) VALUES (valor, comentario, comprador, produto, versao);
 END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS notificacao_vendedor_rating;
+CREATE OR REPLACE FUNCTION notificacao_vendedor_rating()
+RETURNS TRIGGER
+AS $$
+DECLARE 
+mensagem varchar;
+id_vendedor INT;
+id_produto INT;
+v_produto INT;
+    BEGIN
+
+    --OBTER id do vendedor do produto
+    SELECT produto_id, produto_versao INTO id_produto, v_produto FROM ratings where produto_id = NEW.produto_id;
+    SELECT vendedor_id INTO id_vendedor FROM produtos where id = id_produto and versao = versao_produto;
+
+    mensagem := concat('O user ',NEW.comprador_id,' avaliou o produto com id ',NEW.produto_id,' com ',NEW.valor,' estrela(s) e comentou: ',NEW.comentario,'.');
+
+    INSERT INTO notificacoes(data,texto,utilizador_id) VALUES(CURRENT_DATE,mensagem,id_vendedor);
+    RETURN NEW;
+    END
 $$ LANGUAGE plpgsql;
 
 -- COMENTARIOS ============================================================================================
@@ -275,6 +293,28 @@ BEGIN
     END IF;
     RETURN idd;
 END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS notificacao_vista;
+CREATE OR REPLACE FUNCTION notificacao_vista(User_idd INT)
+RETURNS VOID
+AS $$
+DECLARE 
+cur CURSOR for SELECT n.vista,n.id from notificacoes n WHERE n.utilizador_id = User_idd and n.vista = 'false' ;
+row_item record;
+    BEGIN
+
+    OPEN cur;
+    LOOP
+    FETCH cur into row_item;
+    exit when not found;
+
+    UPDATE notificacoes SET vista = 'true' where row_item.id = id; 
+
+    end loop;
+    close cur;
+
+    END
 $$ LANGUAGE plpgsql;
 
 --TODO: fazer uma funcao que devolva todas as notificacoes do user

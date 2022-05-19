@@ -30,6 +30,7 @@ CREATE TABLE itens (
 	produto_id BIGINT,
 	versao_produto INTEGER NOT NULL,
 	vendedor_id INTEGER NOT NULL,
+	comprador_id INTEGER NOT NULL,--FIXME: VERIFICAR SE NAO É MELHOR RETIRAR!!
 	PRIMARY KEY(compra_id, produto_id,versao_produto)
 );
 CREATE TABLE ratings (
@@ -38,7 +39,7 @@ CREATE TABLE ratings (
 	comprador_id BIGINT NOT NULL,
 	produto_id BIGINT NOT NULL,
 	produto_versao INTEGER NOT NULL,
-	PRIMARY KEY(produto_id, produto_versao)
+	PRIMARY KEY(produto_id,produto_versao,comprador_id)
 );
 CREATE TABLE utilizadores (
 	id SERIAL,

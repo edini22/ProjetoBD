@@ -193,6 +193,7 @@ def signIn():
 # qualquer um pode se registar como comprador
 # apenas admins adicionam admins e vendedores
 
+
 @app.route('/user/', methods=['POST'])
 @verify_token_login
 def new_user(type_user):
@@ -311,23 +312,29 @@ def get_all_produts():
             # Argumentos particulares
             cur.execute('SELECT GET_TIPO(%s);', (int(row[0]),))
             tipo = cur.fetchall()[0][0]
-            
+
             if tipo == 'computador':
-                cur.execute('SELECT * FROM computadores c WHERE c.produto_id = %s AND c.produto_versao = %s;',(row[0], row[5]))
+                cur.execute(
+                    'SELECT * FROM computadores c WHERE c.produto_id = %s AND c.produto_versao = %s;', (row[0], row[5]))
                 row2 = cur.fetchall()
-                aux = {'Processador': row2[0][0],'Ram': int(row2[0][1]), 'Rom': int(row2[0][2]),'Grafica': row2[0][3]}
+                aux = {'Processador': row2[0][0], 'Ram': int(
+                    row2[0][1]), 'Rom': int(row2[0][2]), 'Grafica': row2[0][3]}
                 content.update(aux)
 
             elif tipo == 'telemovel':
-                cur.execute('SELECT * FROM telemoveis t WHERE t.produto_id = %s AND t.produto_versao = %s;',(row[0], row[5]))
+                cur.execute(
+                    'SELECT * FROM telemoveis t WHERE t.produto_id = %s AND t.produto_versao = %s;', (row[0], row[5]))
                 row2 = cur.fetchall()
-                aux = {'Tamanho': float(row2[0][0]), 'Ram': int(row2[0][1]), 'Rom': int(row2[0][2])}
+                aux = {'Tamanho': float(row2[0][0]), 'Ram': int(
+                    row2[0][1]), 'Rom': int(row2[0][2])}
                 content.update(aux)
 
             elif tipo == 'televisao':
-                cur.execute('SELECT * FROM televisoes t WHERE t.produto_id = %s AND t.produto_versao = %s;',(row[0], row[5]))
+                cur.execute(
+                    'SELECT * FROM televisoes t WHERE t.produto_id = %s AND t.produto_versao = %s;', (row[0], row[5]))
                 row2 = cur.fetchall()
-                aux = {'Tamanho': float(row2[0][0]), 'Resolucao': int(row2[0][1])}
+                aux = {'Tamanho': float(
+                    row2[0][0]), 'Resolucao': int(row2[0][1])}
                 content.update(aux)
 
             Results.append(content)
@@ -694,7 +701,7 @@ def change_product(user_id, type_user, produto_id):
             rom = rows[0][2]
             grafica = rows[0][3]
 
-            versao += 1 # aumentar a versao em 1 valor
+            versao += 1  # aumentar a versao em 1 valor
 
             if 'processador' in payload:
                 processador = payload['processador']
@@ -710,7 +717,7 @@ def change_product(user_id, type_user, produto_id):
 
             add = 'SELECT add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
             values = (produto_id, versao, nome, descricao, preco,
-                        stock, user_id, processador, ram, rom, grafica)
+                      stock, user_id, processador, ram, rom, grafica)
             cur.execute(add, values)
 
             response = {
@@ -815,7 +822,7 @@ def order(user_id, type_user):
     values = (json.dumps(payload['cart']), user_id)
 
     conn = db_connection()
-    cur = conn.cursor()  # TODO: FAZER AGR A FUNCAO SQL
+    cur = conn.cursor() 
     try:
         cur.execute(add, values)
         reponse = {'Status': StatusCodes['success'],
@@ -838,7 +845,7 @@ def order(user_id, type_user):
 
 # Rating =========================================================================
 
-# http://localhost:8080/rating/{produto_id}
+# http://localhost:8080/ratings/{produto_id}
 
 @app.route('/ratings/<produto_id>', methods=['POST'])
 @verify_token
@@ -860,14 +867,14 @@ def rating(user_id, type_user, produto_id):
         comentario = ' '
     else:
         comentario = payload['comentario']
-    
+
     valor = payload['valor']
 
-    if valor>5 or valor<1:
+    if valor > 5 or valor < 1:
         reponse = {
             'Status': StatusCodes['internal_error'], 'error': "O valor do rating tem de estar entre 1 e 5"}
         return jsonify(reponse)
-    
+
     conn = db_connection()
     cur = conn.cursor()
 
@@ -887,8 +894,11 @@ def rating(user_id, type_user, produto_id):
 
         cur.execute("SELECT add_rating(%s, %s, %s, %s, %s)",
                     (valor, comentario, user_id, produto_id, versao))
-        
-        response = {'Status': StatusCodes['success'], 'Results': "Rating inserido com sucesso"}
+
+        response = {'Status': StatusCodes['success'],
+                    'Results': "Rating inserido com sucesso"}
+
+        conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
@@ -903,7 +913,7 @@ def rating(user_id, type_user, produto_id):
     return flask.jsonify(response)
 
 
-# http://localhost:8080/rating/{produto_id}
+# http://localhost:8080/ratings/{produto_id}
 
 @app.route('/ratings/<produto_id>', methods=['GET'])
 def see_ratings(produto_id):
@@ -912,16 +922,19 @@ def see_ratings(produto_id):
     conn = db_connection()
     cur = conn.cursor()
     try:
-        cur.execute('SELECT r.valor, r.comentario, r.comprador_id FROM ratings r WHERE r.produto_id = %s;', (produto_id,))
+        cur.execute(
+            'SELECT r.valor, r.comentario, r.comprador_id FROM ratings r WHERE r.produto_id = %s;', (produto_id,))
         rows = cur.fetchall()
         results = []
 
         for row in rows:
-            content = {'Valor': int(row[0]), 'Comentario': row[1], 'ID Comprador': row[2]}
+            content = {'Valor': int(
+                row[0]), 'Comentario': row[1], 'ID Comprador': row[2]}
             results.append(content)
 
-        if results == []: # rows == None
-            response = {'Status': StatusCodes['internal_error'], 'Resultado': 'O produto nao tem ratings'}
+        if results == []:  # rows == None
+            response = {
+                'Status': StatusCodes['internal_error'], 'Resultado': 'O produto nao tem ratings'}
             return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'Results': results}
@@ -962,7 +975,10 @@ def comment1(user_id, type_user, produto_id):
 
         cur.execute(statement, values)
 
-        response = {'Status': StatusCodes['success'], 'Results': 'Comentario adicionado com sucesso'}
+        response = {'Status': StatusCodes['success'],
+                    'Results': 'Comentario adicionado com sucesso'}
+
+        conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
@@ -974,9 +990,9 @@ def comment1(user_id, type_user, produto_id):
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(response)   
+    return flask.jsonify(response)
 
-    
+
 # http://localhost:8080/comentario/{produto_id}/{comentario_pai}
 
 @app.route('/comentario/<produto_id>/<comentario_pai_id>', methods=['POST'])
@@ -999,7 +1015,10 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
 
         cur.execute(statement, values)
 
-        response = {'Status': StatusCodes['success'], 'Results': 'Comentario resposta adicionado com sucesso'}
+        response = {'Status': StatusCodes['success'],
+                    'Results': 'Comentario resposta adicionado com sucesso'}
+
+        conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
@@ -1038,12 +1057,16 @@ def see_comments(produto_id):
             logger.debug(row)
 
             if comentario_pai == None:
-                content = {'ID': int(idd), 'Texto': texto, 'Utilizador': utilizador}
+                content = {'ID': int(idd), 'Texto': texto,
+                           'Utilizador': utilizador}
             else:
-                content = {'ID': int(idd), 'Texto': texto, 'Utilizador': utilizador, 'ID Comentario pai': comentario_pai}
+                content = {'ID': int(
+                    idd), 'Texto': texto, 'Utilizador': utilizador, 'ID Comentario pai': comentario_pai}
             Results.append(content)
-        
+
         response = {'Status': StatusCodes['success'], 'results': Results}
+
+        conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
@@ -1055,7 +1078,7 @@ def see_comments(produto_id):
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(response) 
+    return flask.jsonify(response)
 
 
 # http://localhost:8080/notificacoes/
@@ -1069,32 +1092,34 @@ def see_notifications(user_id, type_user):
     cur = conn.cursor()
 
     try:
-        # TODO: ver sapenas as que nao foram vistas
-        cur.execute('SELECT n.id, n.texto. n.data from notificacoes n WHERE n.utilizador_id = %s;',(user_id,))
+        # TODO: ver apenas as que nao foram vistas
+        cur.execute('SELECT n.id, n.texto, n.data from notificacoes n WHERE n.utilizador_id = %s and n.vista = false;', (user_id,))
         rows = cur.fetchall()
         results = []
-        
+
         for row in rows:
             content = {'ID': row[0], 'Notificacao': row[1], 'Data': row[2]}
             results.append(content)
 
         response = {'Status': StatusCodes['success'], 'Results': results}
 
-        # TODO: meter as notificacoes vista a true
+        cur.execute('SELECT notificacao_vista(%s);', (user_id,))
+
+        conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
-        response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        response = {'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(response) 
+    return flask.jsonify(response)
 
 # =============================================================================================================
+
 
 if __name__ == '__main__':
     db = db_connection()
