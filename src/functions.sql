@@ -430,6 +430,20 @@ $$ LANGUAGE plpgsql;
 
 -- UTILIZADORES ======================================================================================
 
+-- Devolve o id do user dando o seu username
+CREATE OR REPLACE FUNCTION ID_USER(UN VARCHAR)
+RETURNS INT
+AS
+$$
+DECLARE
+    idd INT;
+BEGIN
+    SELECT utilizadores.id INTO idd FROM utilizadores
+    WHERE utilizadores.username = UN;
+    RETURN idd;
+END;
+$$ LANGUAGE plpgsql;
+
 -- insere um vendedor
 CREATE OR REPLACE PROCEDURE ADD_VENDEDOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Nif INTEGER)
 AS
