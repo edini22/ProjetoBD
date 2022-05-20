@@ -98,9 +98,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-DROP FUNCTION IF EXISTS add_compra CASCADE; 
-CREATE  FUNCTION add_compra(js json ,Id_comprador INTEGER)
-RETURNS VOID
+CREATE  PROCEDURE add_compra(js json ,Id_comprador INTEGER)
 AS
 $$
 DECLARE
@@ -222,9 +220,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-drop function IF EXISTS add_rating CASCADE;
-CREATE FUNCTION add_rating(valor INT, comentario VARCHAR, comprador INT, produto INT, versao INT)
-RETURNS VOID
+CREATE PROCEDURE add_rating(valor INT, comentario VARCHAR, comprador INT, produto INT, versao INT)
 AS
 $$
 DECLARE
@@ -256,9 +252,7 @@ v_produto INT;
 $$ LANGUAGE plpgsql;
 
 -- COMENTARIOS ============================================================================================
-drop function IF EXISTS add_comentario1 CASCADE;
-CREATE  FUNCTION add_comentario1(texto VARCHAR, utilizador INT, produto INT)
-RETURNS VOID
+CREATE  PROCEDURE add_comentario1(texto VARCHAR, utilizador INT, produto INT)
 AS
 $$
 DECLARE
@@ -268,9 +262,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-drop function IF EXISTS add_comentario2 CASCADE;
-CREATE  FUNCTION add_comentario2(texto VARCHAR, utilizador INT, produto INT, comentario_pai INT)
-RETURNS VOID
+CREATE  PROCEDURE add_comentario2(texto VARCHAR, utilizador INT, produto INT, comentario_pai INT)
 AS
 $$
 DECLARE
@@ -330,9 +322,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION IF EXISTS notificacao_vista CASCADE;
-CREATE OR REPLACE FUNCTION notificacao_vista(User_idd INT)
-RETURNS VOID
+CREATE OR REPLACE PROCEDURE notificacao_vista(User_idd INT)
 AS $$
 DECLARE 
 cur CURSOR for SELECT n.vista,n.id from notificacoes n WHERE n.utilizador_id = User_idd and n.vista = 'false' ;
@@ -405,10 +395,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- insere um computador
-DROP FUNCTION IF EXISTS add_computador CASCADE;      
-CREATE  FUNCTION add_computador(id_produto INT,Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
-RETURNS void
+-- insere um computador    
+CREATE  PROCEDURE add_computador(id_produto INT,Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
 AS
 $$
 DECLARE
@@ -419,9 +407,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um telemovel
-DROP FUNCTION IF EXISTS add_telemovel CASCADE; 
-CREATE  FUNCTION add_telemovel(id_produto INT,Versao INT,Nome_telemovel VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Ram INTEGER,Rom INTEGER)
-RETURNS void
+CREATE  PROCEDURE add_telemovel(id_produto INT,Versao INT,Nome_telemovel VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Ram INTEGER,Rom INTEGER)
 AS
 $$
 DECLARE
@@ -432,9 +418,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere uma televisao
-DROP FUNCTION IF EXISTS add_televisao CASCADE; 
-CREATE  FUNCTION add_televisao(id_produto INT,Versao INT,Nometv VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Resolucao INTEGER)
-RETURNS void
+CREATE  PROCEDURE add_televisao(id_produto INT,Versao INT,Nometv VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Resolucao INTEGER)
 AS
 $$
 DECLARE
@@ -447,8 +431,7 @@ $$ LANGUAGE plpgsql;
 -- UTILIZADORES ======================================================================================
 
 -- insere um vendedor
-CREATE OR REPLACE FUNCTION ADD_VENDEDOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Nif INTEGER)
-RETURNS void
+CREATE OR REPLACE PROCEDURE ADD_VENDEDOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Nif INTEGER)
 AS
 $$
 DECLARE
@@ -459,8 +442,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um comprador
-CREATE OR REPLACE FUNCTION ADD_COMPRADOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Morada VARCHAR)
-RETURNS void
+CREATE OR REPLACE PROCEDURE ADD_COMPRADOR(userName VARCHAR,pass VARCHAR,Nome VARCHAR,Morada VARCHAR)
 AS
 $$
 DECLARE
@@ -471,8 +453,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um admin
-CREATE OR REPLACE FUNCTION ADD_ADMIN(userName VARCHAR,pass VARCHAR,Nome VARCHAR)
-RETURNS void
+CREATE OR REPLACE PROCEDURE ADD_ADMIN(userName VARCHAR,pass VARCHAR,Nome VARCHAR)
 AS
 $$
 DECLARE
@@ -577,3 +558,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION GET_report_year()
+RETURNS JSONB
+AS
+$$
+DECLARE
+js JSONB ;
+    BEGIN
+    RETURN js;
+END;
+$$ LANGUAGE plpgsql;

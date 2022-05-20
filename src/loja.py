@@ -245,9 +245,9 @@ def new_user(type_user):
                    'error': 'vendedores nao têm este acesso!'}
         return flask.jsonify(response)
 
-    addAdmin = 'SELECT ADD_ADMIN(%s,%s,%s);'
-    addcomp = 'SELECT ADD_COMPRADOR(%s,%s,%s,%s);'
-    addvend = 'SELECT ADD_VENDEDOR(%s,%s,%s,%d);'
+    addAdmin = 'CALL ADD_ADMIN(%s,%s,%s);'
+    addcomp = 'CALL ADD_COMPRADOR(%s,%s,%s,%s);'
+    addvend = 'CALL ADD_VENDEDOR(%s,%s,%s,%d);'
 
     conn = db_connection()
     cur = conn.cursor()
@@ -587,20 +587,20 @@ def new_product(user_id, type_user):
         idd = int(cur.fetchall()[0][0])+1
 
         if(payload['tipo'] == "computador"):
-            add = 'SELECT add_computador(%s,1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
+            add = 'CALL add_computador(%s,1,%s,%s,%s,%s,%s,%s,%s,%s,%s);'
 
             values = (idd, payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
                 user_id), payload['processador'], int(payload['ram']), int(payload['rom']), payload['grafica'])
             cur.execute(add, values)
 
         elif(payload['tipo'] == "telemovel"):
-            add = 'SELECT add_telemovel(%s,1,%s,%s,%s,%s,%s,%s,%s,%s);'
+            add = 'CALL add_telemovel(%s,1,%s,%s,%s,%s,%s,%s,%s,%s);'
             values = (idd, payload['nome'], payload['descricao'], float(payload['preco']), int(payload['stock']), int(
                 user_id), float(payload['tamanho']), int(payload['ram']), int(payload['rom']))
             cur.execute(add, values)
 
         else:
-            add = 'SELECT add_televisao(%s,1,%s,%s,%s,%s,%s,%s,%s);'
+            add = 'CALL add_televisao(%s,1,%s,%s,%s,%s,%s,%s,%s);'
             values = (idd, payload['nome'], payload['descricao'], float(payload['preco']), int(
                 payload['stock']), int(user_id), float(payload['tamanho']), payload['resolucao'])
             cur.execute(add, values)
@@ -719,7 +719,7 @@ def change_product(user_id, type_user, produto_id):
             if 'grafica' in payload:
                 grafica = payload['grafica']
 
-            add = 'SELECT add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
+            add = 'CALL add_computador(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
             values = (produto_id, versao, nome, descricao, preco,
                       stock, user_id, processador, ram, rom, grafica)
             cur.execute(add, values)
@@ -747,7 +747,7 @@ def change_product(user_id, type_user, produto_id):
 
             versao += 1  # aumentar a versao em 1 valor
 
-            cur.execute('SELECT add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+            cur.execute('CALL add_telemovel(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
                         (produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, ram, rom))
             response = {
                 'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
@@ -768,7 +768,7 @@ def change_product(user_id, type_user, produto_id):
 
             versao += 1  # aumentar a versao em 1 valor
 
-            cur.execute('SELECT add_televisao(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
+            cur.execute('CALL add_televisao(%s, %s, %s, %s, %s, %s, %s, %s, %s);',
                         (produto_id, versao, nome, descricao, preco, stock, user_id, tamanho, resolucao))
             response = {
                 'Status': StatusCodes['success'], 'Results': f'Produto \'{nome}\' atualizado'}
@@ -822,7 +822,7 @@ def order(user_id, type_user):
                         'results': 'product_id is required to update'}
             return flask.jsonify(response)
 
-    add = 'SELECT add_compra(%s,%s);'
+    add = 'CALL add_compra(%s,%s);'
     values = (json.dumps(payload['cart']), user_id)
 
     conn = db_connection()
@@ -894,14 +894,14 @@ def rating(user_id, type_user, produto_id):
         # FIXME: verificar o que acontece se o comprador comprar duas versoes diferentes do mesmo produto
         cur.execute(statement, values)
         versao = cur.fetchall()[0][0]
-        print(f"DEBUG: Versao -> {versao}")
+        #print(f"DEBUG: Versao -> {versao}")
 
         if(versao == 0):
             response = {
                 'Status': StatusCodes['internal_error'], 'error': "Para avaliar um produto tem de o comprar"}
             return jsonify(response)
 
-        cur.execute("SELECT add_rating(%s, %s, %s, %s, %s)",
+        cur.execute("call add_rating(%s, %s, %s, %s, %s)",
                     (valor, comentario, user_id, produto_id, versao))
 
         response = {'Status': StatusCodes['success'],
@@ -981,7 +981,7 @@ def comment1(user_id, type_user, produto_id):
     logger.debug(f'POST /dbproj/questions/{produto_id} - payload: {payload}')
 
     try:
-        statement = 'SELECT add_comentario1(%s, %s, %s)'
+        statement = 'CALL add_comentario1(%s, %s, %s)'
         values = (payload['texto'], user_id, produto_id)
 
         cur.execute(statement, values)
@@ -1023,7 +1023,7 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
     logger.debug(f'POST /dbproj/questions/{produto_id}/{comentario_pai_id} - payload: {payload}')
 
     try:
-        statement = 'SELECT add_comentario2(%s, %s, %s, %s)'
+        statement = 'CALL add_comentario2(%s, %s, %s, %s)'
         values = (payload['texto'], user_id, produto_id, comentario_pai_id)
 
         cur.execute(statement, values)
@@ -1126,7 +1126,7 @@ def see_notifications(user_id, type_user):
 
         response = {'Status': StatusCodes['success'], 'Results': results}
 
-        cur.execute('SELECT notificacao_vista(%s);', (user_id,))
+        cur.execute('CALL notificacao_vista(%s);', (user_id,))
 
         conn.commit()
 
@@ -1178,6 +1178,43 @@ def get_product(produto_id):
             conn.close()
 
     return flask.jsonify(response)
+
+
+# http://localhost:8080/dbproj/report/year
+@app.route('/dbproj/report/year', methods=['GET'])
+@verify_token
+def report_year(user_id, type_user):
+    if(type_user != "admin"):
+        response = {
+            'Status': StatusCodes['internal_error'], 'error': "Apenas Admins podem efetuar esta operacao!"}
+        return jsonify(response)
+
+    logger.info('GET /dbproj/report/year')
+
+    
+    conn = db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('SELECT GET_report_year()')
+        rows = cur.fetchall()[0][0]
+
+        logger.debug('GET /comentario - parse')
+
+        response = {'Status': StatusCodes['success'], 'results': rows}
+
+        conn.commit()
+
+    except(Exception, psycopg2.DatabaseError) as error:
+        logger.error(f'POST /user - error: {error}')
+        response = {
+            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        conn.rollback()
+
+    finally:
+        if conn is not None:
+            conn.close()
+    
 
 # =============================================================================================================
 
