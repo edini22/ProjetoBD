@@ -98,7 +98,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE  PROCEDURE add_compra(js json ,Id_comprador INTEGER)
+CREATE OR REPLACE  PROCEDURE add_compra(js json ,Id_comprador INTEGER)
 AS
 $$
 DECLARE
@@ -220,7 +220,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE PROCEDURE add_rating(valor INT, comentario VARCHAR, comprador INT, produto INT, versao INT)
+CREATE OR REPLACE PROCEDURE add_rating(valor INT, comentario VARCHAR, comprador INT, produto INT, versao INT)
 AS
 $$
 DECLARE
@@ -252,7 +252,7 @@ v_produto INT;
 $$ LANGUAGE plpgsql;
 
 -- COMENTARIOS ============================================================================================
-CREATE  PROCEDURE add_comentario1(texto VARCHAR, utilizador INT, produto INT)
+CREATE  OR REPLACE PROCEDURE add_comentario1(texto VARCHAR, utilizador INT, produto INT)
 AS
 $$
 DECLARE
@@ -262,7 +262,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE  PROCEDURE add_comentario2(texto VARCHAR, utilizador INT, produto INT, comentario_pai INT)
+CREATE OR REPLACE PROCEDURE add_comentario2(texto VARCHAR, utilizador INT, produto INT, comentario_pai INT)
 AS
 $$
 DECLARE
@@ -396,7 +396,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um computador    
-CREATE  PROCEDURE add_computador(id_produto INT,Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
+CREATE OR REPLACE PROCEDURE add_computador(id_produto INT,Versao INT,Nomepc VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Processador VARCHAR,Ram INTEGER,Rom INTEGER,Grafica VARCHAR)
 AS
 $$
 DECLARE
@@ -407,7 +407,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere um telemovel
-CREATE  PROCEDURE add_telemovel(id_produto INT,Versao INT,Nome_telemovel VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Ram INTEGER,Rom INTEGER)
+CREATE OR REPLACE PROCEDURE add_telemovel(id_produto INT,Versao INT,Nome_telemovel VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Ram INTEGER,Rom INTEGER)
 AS
 $$
 DECLARE
@@ -418,7 +418,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- insere uma televisao
-CREATE  PROCEDURE add_televisao(id_produto INT,Versao INT,Nometv VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Resolucao INTEGER)
+CREATE OR REPLACE PROCEDURE add_televisao(id_produto INT,Versao INT,Nometv VARCHAR,Descricao VARCHAR,Preco FLOAT,Stock INTEGER,ID_VEND INTEGER,Tamanho FLOAT,Resolucao INTEGER)
 AS
 $$
 DECLARE
@@ -486,17 +486,16 @@ $$
 DECLARE
     idd INT :=-1;
     js JSONB ;
-    js_price JSONB;
+    js_price TEXT[];
+    js_comentarios TEXT[];
     cur CURSOR for SELECT p.preco,p.versao,p.data FROM produtos p WHERE p.id = ID_PRODUTO ORDER BY p.versao DESC;
-    cur2 CURSOR for SELECT c.texto FROM comentarios c WHERE c.produto_id = ID_PRODUTO;
     row_item record;
     m_versao INT;
     n_comentarios INT;
     n_ratings INT;
     valor_rating INT :=0;
     mensagem VARCHAR;
-    mens VARCHAR;
-    coun INT :=0;
+    r TEXT;
 BEGIN 
 
     SELECT p.id INTO idd FROM produtos p WHERE p.id = ID_PRODUTO;
@@ -505,55 +504,34 @@ BEGIN
         SELECT COUNT(id) into n_comentarios FROM comentarios WHERE produto_id = ID_PRODUTO ;
         SELECT COUNT(valor) into n_ratings FROM ratings WHERE produto_id = ID_PRODUTO ;
         SELECT row_to_json(produtos) into js  FROM(SELECT id,nome,stock,versao,descricao,vendedor_id FROM produtos ) produtos WHERE id = ID_PRODUTO and versao = m_versao;
-
-        IF n_comentarios = 0 AND n_ratings = 0 THEN
+        
+        IF  n_comentarios = 0 THEN
             js :=  js::jsonb || '{"comentarios": "Nao existem comentarios feitos acerca deste produtos"}'::jsonb;
-            js :=  js::jsonb || '{"rating": "Nao existem ratings feitos para este produto"}'::jsonb;
-
         ELSE 
-            SELECT AVG(valor) into valor_rating FROM ratings WHERE produto_id = ID_PRODUTO ;
-            IF n_comentarios = 0 THEN
-                js :=  js::jsonb || '{"comentarios": "Nao existem comentarios feitos acerca deste produtos"}'::jsonb;
-                js :=  js::jsonb || json_build_object('rating',valor_rating)::jsonb;
-            ELSE 
-                js :=  js::jsonb || json_build_object('rating',valor_rating)::jsonb;
-                OPEN cur2;
-                LOOP
-                FETCH cur2 into mens;
-                exit when not found;
-                raise NOTICE '%',mens;
-                
-                mensagem := concat(mensagem,', ',mens);
-                
-
+            for r in 
+                SELECT texto FROM comentarios  WHERE produto_id = ID_PRODUTO
+                loop 
+                js_comentarios = js_comentarios || r;
                 end loop;
-                js_price := json_build_object('comentarios',mensagem);
-                js :=  js::jsonb || js_price::jsonb;
-                close cur2;
-
-            END IF;
-
+                js =  js::jsonb || json_build_object('comentarios',js_comentarios)::jsonb;
+        END IF;
+        IF n_ratings = 0 THEN
+            js :=  js::jsonb || '{"rating": "Nao existem ratings feitos para este produto"}'::jsonb;
+        ELSE
+            SELECT AVG(valor) into valor_rating FROM ratings WHERE produto_id = ID_PRODUTO ;
+            js :=  js::jsonb || json_build_object('rating',valor_rating)::jsonb;
         END IF;
 
         OPEN cur;
-        LOOP
-        FETCH cur into row_item;
+        LOOP FETCH cur into row_item;
         exit when not found;
-
-        IF row_item.versao = m_versao THEN
-            mensagem := concat(row_item.data,' - ',row_item.preco);
-        ELSE
-            mensagem := concat(mensagem,', ',row_item.data,' - ',row_item.preco);
-        END IF;
-        raise NOTICE '%',mensagem;
-
+        mensagem := concat(row_item.data,' - ',row_item.preco);
+        js_price = js_price || mensagem;
         end loop;
-        js_price := json_build_object('preco',mensagem);
-        js :=  js::jsonb || js_price::jsonb;
+        js =  js::jsonb || json_build_object('preco',js_price)::jsonb;
         close cur;
 
     END IF;
-
     RETURN js;
 END;
 $$ LANGUAGE plpgsql;

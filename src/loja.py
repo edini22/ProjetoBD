@@ -298,7 +298,7 @@ def get_all_produts():
 
     try:
 
-        cur.execute('SELECT * FROM produtos')
+        cur.execute('SELECT id,nome,descricao,preco,stock,versao,vendedor_id FROM produtos')
         rows = cur.fetchall()
 
         logger.debug('GET /produtos - parse')
