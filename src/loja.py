@@ -1023,6 +1023,14 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
     logger.debug(f'POST /dbproj/questions/{produto_id}/{comentario_pai_id} - payload: {payload}')
 
     try:
+        cur.execute('SELECT id FROM comentarios WHERE id = %s',(comentario_pai_id,))
+        val = cur.fetchall()
+        print(val)
+        if(val == []):
+            response = {
+            'Status': StatusCodes['internal_error'], 'error': "Nao existe nenhum comentario pai com esse id"}
+            return jsonify(response)
+
         statement = 'CALL add_comentario2(%s, %s, %s, %s)'
         values = (payload['texto'], user_id, produto_id, comentario_pai_id)
 
