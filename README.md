@@ -33,6 +33,14 @@ create database projetobd
 ``` shell
 grant all privileges on database projetobd to aulaspl
 ```
+### Run Sql files
+```txt
+1. setup.sql
+2. functions.sql
+3. trigger.sql
+4. insert.sql
+```
+
 ### Run API
 Run *loja.py* on your prefered IDE or Text Editor
 ### Reach Endpoints
