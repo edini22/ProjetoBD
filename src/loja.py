@@ -14,18 +14,11 @@ app = flask.Flask(__name__)
 
 StatusCodes = {
     'success': 200,
-    'api_error': 400,
-    'internal_error': 500
+    'bad_request': 400,
+    'api_error': 500
 }
 
 global f
-
-# Acesso a DataBase
-# DEBUG: comprador pode fazer varios ratings!!
-# rating pode ser uma chave fraca
-# produtos, retirar a tabela do historico e colocar um atributo de versao!, retirar o id de unique!!
-# alguns autoincremnete, é melhor retirar !!
-
 
 def db_connection():
     db = psycopg2.connect(
@@ -41,14 +34,14 @@ def db_connection():
 # ENDPOINTS =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
-@app.route('/')
+@app.route('/dbproj')
 def landing_page():
     return """
     Bem vindo à loja DataStore!
     Comece as suas compras assim que possível :)
 
-    Para se registar use o Endpoint http://localhost:8080/user/ (POST)
-    Para se autenticar use o Endpoint http://localhost:8080/user/ (PUT)
+    Para se registar use o Endpoint http://localhost:8080/dbproj/user/ (POST)
+    Para se autenticar use o Endpoint http://localhost:8080/dbproj/user/ (PUT)
 
     Fábio Santos 2020212310
     Eduardo Figueiredo 2020213717
@@ -146,11 +139,11 @@ def signIn():
     logger.debug(f'PUT /dbproj/user/ - payload: {payload}')
 
     if 'username' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'username is required to update'}
         return flask.jsonify(response)
     if 'password' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'password is required to update'}
         return flask.jsonify(response)
 
@@ -175,7 +168,7 @@ def signIn():
     except (Exception, psycopg2.DatabaseError) as error:
         logger.error(error)
         response = {
-            'status': StatusCodes['internal_error'], 'errors': str(error)}
+            'status': StatusCodes['api_error'], 'errors': str(error)}
 
         # an error occurred, rollback
         conn.rollback()
@@ -198,22 +191,22 @@ def new_user(type_user):
 
     # Verificar todos os parametros para adicionar user
     if 'username' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'username is required to update'}
         return flask.jsonify(response)
 
     if 'password' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'password is required to update'}
         return flask.jsonify(response)
 
     if 'nome' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'nome is required to update'}
         return flask.jsonify(response)
 
     if 'tipo' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'tipo is required to update'}
         return flask.jsonify(response)
 
@@ -221,27 +214,27 @@ def new_user(type_user):
     if(payload['tipo'] == "comprador"):
         if 'morada' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'morada is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'morada is required to update'}
             return flask.jsonify(response)
 
     elif(payload['tipo'] == "vendedor"):
         if(type_user != "admin"):
-            return jsonify({'status': StatusCodes['api_error'], 'errors': 'wrong user type'})
+            return jsonify({'status': StatusCodes['bad_request'], 'errors': 'wrong user type'})
         if 'nif' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'nif is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'nif is required to update'}
             return flask.jsonify(response)
 
     elif(payload['tipo'] == "admin"):
         if(type_user != "admin"):
-            return jsonify({'status': StatusCodes['api_error'], 'errors': 'wrong user type'})
+            return jsonify({'status': StatusCodes['bad_request'], 'errors': 'wrong user type'})
     else:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'tipo incorreto(admin/comprador/utilizador)'}
         return flask.jsonify(response)
 
     if ((payload['tipo'] == "admin" or payload['tipo'] == "vendedor") and type_user == "vendedor"):
-        response = {'Status': StatusCodes['internal_error'],
+        response = {'Status': StatusCodes['api_error'],
                    'error': 'vendedores nao têm este acesso!'}
         return flask.jsonify(response)
 
@@ -276,7 +269,7 @@ def new_user(type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -343,7 +336,7 @@ def get_all_produts():
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /produtos - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
 
     finally:
         if conn is not None:
@@ -362,7 +355,7 @@ def get_all_users(user_id, type_user):
     # Verficar permissoes
     if(type_user == "comprador"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
+            'Status': StatusCodes['api_error'], 'error': "compradores nao têm este acesso!"}
         return jsonify(response)
 
     conn = db_connection()
@@ -385,7 +378,7 @@ def get_all_users(user_id, type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /utilizadores - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'error': str(error)}
+            'Status': StatusCodes['api_error'], 'error': str(error)}
 
     finally:
         if conn is not None:
@@ -404,7 +397,7 @@ def get_all_buyers(user_id, type_user):
     # Verficar permissoes
     if(type_user == "comprador"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
+            'Status': StatusCodes['api_error'], 'error': "compradores nao têm este acesso!"}
         return jsonify(response)
 
     conn = db_connection()
@@ -429,7 +422,7 @@ def get_all_buyers(user_id, type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /compradores - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'error': str(error)}
+            'Status': StatusCodes['api_error'], 'error': str(error)}
 
     finally:
         if conn is not None:
@@ -448,12 +441,12 @@ def get_all_sellers(user_id, type_user):
     # Verficar permissoes
     if(type_user == "comprador"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
+            'Status': StatusCodes['api_error'], 'error': "compradores nao têm este acesso!"}
         return jsonify(response)
 
     if(type_user == "vendedor"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "vendedorres nao têm este acesso!"}
+            'Status': StatusCodes['api_error'], 'error': "vendedorres nao têm este acesso!"}
         return jsonify(response)
 
     conn = db_connection()
@@ -478,7 +471,7 @@ def get_all_sellers(user_id, type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /vendedores - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'error': str(error)}
+            'Status': StatusCodes['api_error'], 'error': str(error)}
 
     finally:
         if conn is not None:
@@ -499,82 +492,82 @@ def new_product(user_id, type_user):
     # Verficar permissoes
     if(type_user != "vendedor"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Apenas Vendedores podem adicionar produtos!"}
+            'Status': StatusCodes['api_error'], 'error': "Apenas Vendedores podem adicionar produtos!"}
         return jsonify(response)
 
     # Verficar dados
     if 'nome' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'nome is required to update'}
         return flask.jsonify(response)
 
     if 'descricao' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'descricao is required to update'}
         return flask.jsonify(response)
 
     if 'preco' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'preco is required to update'}
         return flask.jsonify(response)
 
     if 'stock' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'stock is required to update'}
         return flask.jsonify(response)
 
     if 'tipo' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'tipo is required to update'}
         return flask.jsonify(response)
 
     if(payload['tipo'] == "computador"):
         if 'processador' not in payload:
-            response = {'status': StatusCodes['api_error'],
+            response = {'status': StatusCodes['bad_request'],
                         'results': 'processador is required to update'}
             return flask.jsonify(response)
         if 'ram' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'ram is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'ram is required to update'}
             return flask.jsonify(response)
         if 'rom' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'rom is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'rom is required to update'}
             return flask.jsonify(response)
 
         if 'grafica' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'grafica is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'grafica is required to update'}
             return flask.jsonify(response)
 
     elif(payload['tipo'] == "telemovel"):
         if 'tamanho' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'tamanho is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'tamanho is required to update'}
             return flask.jsonify(response)
 
         if 'ram' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'ram is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'ram is required to update'}
             return flask.jsonify(response)
         if 'rom' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'rom is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'rom is required to update'}
             return flask.jsonify(response)
 
     elif(payload['tipo'] == "televisao"):
         if 'tamanho' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'tamanho is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'tamanho is required to update'}
             return flask.jsonify(response)
 
         if 'resolucao' not in payload:
             response = {
-                'status': StatusCodes['api_error'], 'results': 'resolucao is required to update'}
+                'status': StatusCodes['bad_request'], 'results': 'resolucao is required to update'}
             return flask.jsonify(response)
 
     else:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'tipo incorreto(computador/telemovel/televisao)'}
         return flask.jsonify(response)
 
@@ -613,7 +606,7 @@ def new_product(user_id, type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /produtos - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -632,7 +625,7 @@ def change_product(user_id, type_user, produto_id):
 
     # Verificar permissoes
     if type_user != "vendedor":
-        response = {'Status': StatusCodes['internal_error'],
+        response = {'Status': StatusCodes['api_error'],
                     'error': "Apenas Vendedores podem alterar produtos."}
         return jsonify(response)
 
@@ -644,7 +637,7 @@ def change_product(user_id, type_user, produto_id):
         if i not in payload:
             count += 1
     if count == len(lista):
-        response = {'Status': StatusCodes['internal_error'],
+        response = {'Status': StatusCodes['bad_request'],
                     'error': "Nenhum parametro correto para atualizar o produto."}
         return jsonify(response)
 
@@ -659,7 +652,7 @@ def change_product(user_id, type_user, produto_id):
             'SELECT vendedor_id FROM produtos WHERE %s = vendedor_id;', (user_id,))
         vendedor_id = cur.fetchall()[0][0]
         if vendedor_id != int(user_id):
-            response = {'Status': StatusCodes['internal_error'],
+            response = {'Status': StatusCodes['api_error'],
                         'error': "Nao tem permissao para alterar este produto."}
             return jsonify(response)
 
@@ -777,7 +770,7 @@ def change_product(user_id, type_user, produto_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -799,26 +792,26 @@ def order(user_id, type_user):
 
     if(type_user != "comprador"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Apenas Compradores podem efetuar compras!"}
+            'Status': StatusCodes['api_error'], 'error': "Apenas Compradores podem efetuar compras!"}
         return jsonify(response)
 
     if 'cart' not in payload:
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'cart is required to update'}
         return flask.jsonify(response)
 
     if(len(payload['cart']) == 0):
-        response = {'status': StatusCodes['api_error'],
+        response = {'status': StatusCodes['bad_request'],
                     'results': 'Adicione itens ao seu carrinho'}
         return flask.jsonify(response)
 
     for i in range(len(payload['cart'])):
         if 'quantidade' not in payload['cart'][i]:
-            response = {'status': StatusCodes['api_error'],
+            response = {'status': StatusCodes['bad_request'],
                         'results': 'quantidade is required to update'}
             return flask.jsonify(response)
         if 'product_id' not in payload['cart'][i]:
-            response = {'status': StatusCodes['api_error'],
+            response = {'status': StatusCodes['bad_request'],
                         'results': 'product_id is required to update'}
             return flask.jsonify(response)
 
@@ -840,7 +833,7 @@ def order(user_id, type_user):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /compra - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -862,12 +855,12 @@ def rating(user_id, type_user, produto_id):
 
     if type_user != 'comprador':
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Apenas um comprador pode avaliar produtos"}
+            'Status': StatusCodes['api_error'], 'error': "Apenas um comprador pode avaliar produtos"}
         return jsonify(response)
 
     if 'valor' not in payload:
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir o valor do rating"}
+            'Status': StatusCodes['api_error'], 'error': "Tem de incluir o valor do rating"}
         return jsonify(response)
 
     if 'comentario' not in payload:
@@ -879,7 +872,7 @@ def rating(user_id, type_user, produto_id):
 
     if valor > 5 or valor < 1:
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "O valor do rating tem de estar entre 1 e 5"}
+            'Status': StatusCodes['bad_request'], 'error': "O valor do rating tem de estar entre 1 e 5"}
         return jsonify(response)
 
     conn = db_connection()
@@ -898,7 +891,7 @@ def rating(user_id, type_user, produto_id):
 
         if(versao == 0):
             response = {
-                'Status': StatusCodes['internal_error'], 'error': "Para avaliar um produto tem de o comprar"}
+                'Status': StatusCodes['api_error'], 'error': "Para avaliar um produto tem de o comprar"}
             return jsonify(response)
 
         cur.execute("call add_rating(%s, %s, %s, %s, %s)",
@@ -912,7 +905,7 @@ def rating(user_id, type_user, produto_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -943,7 +936,7 @@ def see_ratings(produto_id):
 
         if results == []:  # rows == None
             response = {
-                'Status': StatusCodes['internal_error'], 'Resultado': 'O produto nao tem ratings'}
+                'Status': StatusCodes['api_error'], 'Resultado': 'O produto nao tem ratings'}
             return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'Results': results}
@@ -951,7 +944,7 @@ def see_ratings(produto_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -972,7 +965,7 @@ def comment1(user_id, type_user, produto_id):
 
     if 'texto' not in payload:
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir texto no seu comentario"}
+            'Status': StatusCodes['bad_request'], 'error': "Tem de incluir texto no seu comentario"}
         return jsonify(response)
 
     conn = db_connection()
@@ -994,7 +987,7 @@ def comment1(user_id, type_user, produto_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -1014,7 +1007,7 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
 
     if 'texto' not in payload:
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Tem de incluir texto no seu comentario"}
+            'Status': StatusCodes['bad_request'], 'error': "Tem de incluir texto no seu comentario"}
         return jsonify(response)
 
     conn = db_connection()
@@ -1028,7 +1021,7 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
         print(val)
         if(val == []):
             response = {
-            'Status': StatusCodes['internal_error'], 'error': "Nao existe nenhum comentario pai com esse id"}
+            'Status': StatusCodes['api_error'], 'error': "Nao existe nenhum comentario pai com esse id"}
             return jsonify(response)
 
         statement = 'CALL add_comentario2(%s, %s, %s, %s)'
@@ -1044,7 +1037,7 @@ def comment2(user_id, type_user, produto_id, comentario_pai_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -1087,7 +1080,7 @@ def see_comments(produto_id):
         
         if Results == []: 
             response = {
-                'Status': StatusCodes['internal_error'], 'Resultado': 'O produto nao tem comentarios'}
+                'Status': StatusCodes['api_error'], 'Resultado': 'O produto nao tem comentarios'}
             return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'results': Results}
@@ -1097,7 +1090,7 @@ def see_comments(produto_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -1129,7 +1122,7 @@ def see_notifications(user_id, type_user):
 
         if results == []:
             response = {
-                'Status': StatusCodes['internal_error'], 'Resultado': 'Voce nao tem notificacoes'}
+                'Status': StatusCodes['success'], 'Resultado': 'Voce nao tem notificacoes'}
             return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'Results': results}
@@ -1140,7 +1133,7 @@ def see_notifications(user_id, type_user):
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
-        response = {'Status': StatusCodes['internal_error'], 'Error': str(error)}
+        response = {'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -1167,7 +1160,7 @@ def get_product(produto_id):
         
         if rows == None:
             response = {
-                'Status': StatusCodes['internal_error'], 'Resultado': f'Nao existe nenhum produto com o id {produto_id}'}
+                'Status': StatusCodes['api_error'], 'Resultado': f'Nao existe nenhum produto com o id {produto_id}'}
             return flask.jsonify(response)
 
 
@@ -1178,7 +1171,7 @@ def get_product(produto_id):
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -1194,7 +1187,7 @@ def get_product(produto_id):
 def report_year(user_id, type_user):
     if(type_user != "admin"):
         response = {
-            'Status': StatusCodes['internal_error'], 'error': "Apenas Admins podem efetuar esta operacao!"}
+            'Status': StatusCodes['api_error'], 'error': "Apenas Admins podem efetuar esta operacao!"}
         return jsonify(response)
 
     logger.info('GET /dbproj/report/year')
@@ -1209,19 +1202,18 @@ def report_year(user_id, type_user):
         cur.execute('SELECT GET_report_year()')
         rows = cur.fetchall()[0][0]
         logger.debug('GET /report/year - parse')
-        print('ROWS')
-        print(rows)
-        # if rows == []:
-        #     response = {'Status': StatusCodes['api_error'], 'Erro': "Nao existe historico dos ultimos 12 meses"}
-        #     return flask.jsonify(response)
+
+        if rows == []:
+            response = {'Status': StatusCodes['api_error'], 'Erro': "Nao existe historico dos ultimos 12 meses"}
+            return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'results': rows}
-        # conn.commit()
+        conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
         response = {
-            'Status': StatusCodes['internal_error'], 'Error': str(error)}
+            'Status': StatusCodes['api_error'], 'Error': str(error)}
         conn.rollback()
 
     finally:
@@ -1232,8 +1224,6 @@ def report_year(user_id, type_user):
     
 
 # =============================================================================================================
-
-# in psql , you can run “ \set AUTOCOMMIT off ”
 
 if __name__ == '__main__':
     db = db_connection()
