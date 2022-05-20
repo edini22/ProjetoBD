@@ -1207,7 +1207,7 @@ def report_year(user_id, type_user):
         cur.execute('SELECT GET_report_year()')
         rows = cur.fetchall()[0][0]
 
-        logger.debug('GET /comentario - parse')
+        logger.debug('GET /report/year - parse')
 
         response = {'Status': StatusCodes['success'], 'results': rows}
 
