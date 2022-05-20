@@ -496,65 +496,84 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Devolve o id do user dando o seu username
-CREATE OR REPLACE FUNCTION ID_USER(UN VARCHAR)
-RETURNS INT
+-- Devolve o tipo do produto atraves do user
+DROP FUNCTION IF EXISTS GET_PRODUCT CASCADE;
+CREATE OR REPLACE FUNCTION GET_PRODUCT(ID_PRODUTO INT)
+RETURNS JSONB
 AS
 $$
 DECLARE
-    id INT;
-BEGIN
-    SELECT utilizadores.id INTO id FROM utilizadores
-    WHERE utilizadores.username = UN;
-    RETURN id;
+    idd INT :=-1;
+    js JSONB ;
+    js_price JSONB;
+    cur CURSOR for SELECT p.preco,p.versao,p.data FROM produtos p WHERE p.id = ID_PRODUTO ORDER BY p.versao DESC;
+    cur2 CURSOR for SELECT c.texto FROM comentarios c WHERE c.produto_id = ID_PRODUTO;
+    row_item record;
+    m_versao INT;
+    n_comentarios INT;
+    n_ratings INT;
+    valor_rating INT :=0;
+    mensagem VARCHAR;
+    mens VARCHAR;
+    coun INT :=0;
+BEGIN 
+
+    SELECT p.id INTO idd FROM produtos p WHERE p.id = ID_PRODUTO;
+    IF idd > 0  THEN
+        SELECT MAX(p.versao) INTO m_versao FROM produtos p WHERE p.id = ID_PRODUTO;
+        SELECT COUNT(id) into n_comentarios FROM comentarios WHERE produto_id = ID_PRODUTO ;
+        SELECT COUNT(valor) into n_ratings FROM ratings WHERE produto_id = ID_PRODUTO ;
+        SELECT row_to_json(produtos) into js  FROM(SELECT id,nome,stock,versao,descricao,vendedor_id FROM produtos ) produtos WHERE id = ID_PRODUTO and versao = m_versao;
+
+        IF n_comentarios = 0 AND n_ratings = 0 THEN
+            js :=  js::jsonb || '{"comentarios": "Nao existem comentarios feitos acerca deste produtos"}'::jsonb;
+            js :=  js::jsonb || '{"rating": "Nao existem ratings feitos para este produto"}'::jsonb;
+
+        ELSE 
+            SELECT AVG(valor) into valor_rating FROM ratings WHERE produto_id = ID_PRODUTO ;
+            IF n_comentarios = 0 THEN
+                js :=  js::jsonb || '{"comentarios": "Nao existem comentarios feitos acerca deste produtos"}'::jsonb;
+                js :=  js::jsonb || json_build_object('rating',valor_rating)::jsonb;
+            ELSE 
+                js :=  js::jsonb || json_build_object('rating',valor_rating)::jsonb;
+                OPEN cur2;
+                LOOP
+                FETCH cur2 into mens;
+                exit when not found;
+                raise NOTICE '%',mens;
+                
+                mensagem := concat(mensagem,', ',mens);
+                
+
+                end loop;
+                js_price := json_build_object('comentarios',mensagem);
+                js :=  js::jsonb || js_price::jsonb;
+                close cur2;
+
+            END IF;
+
+        END IF;
+
+        OPEN cur;
+        LOOP
+        FETCH cur into row_item;
+        exit when not found;
+
+        IF row_item.versao = m_versao THEN
+            mensagem := concat(row_item.data,' - ',row_item.preco);
+        ELSE
+            mensagem := concat(mensagem,', ',row_item.data,' - ',row_item.preco);
+        END IF;
+        raise NOTICE '%',mensagem;
+
+        end loop;
+        js_price := json_build_object('preco',mensagem);
+        js :=  js::jsonb || js_price::jsonb;
+        close cur;
+
+    END IF;
+
+    RETURN js;
 END;
 $$ LANGUAGE plpgsql;
-
--- Devolve o tipo do produto atraves do user
--- DROP FUNCTION IF EXISTS GET_PRODUCT CASCADE;
--- CREATE OR REPLACE FUNCTION GET_PRODUCT(ID_PRODUTO INT)
--- RETURNS json
--- AS
--- $$
--- DECLARE
---     idd INT :=-1;
---     js json ;
---     cur CURSOR for SELECT p.preco,p.versao FROM produtos p WHERE p.id = ID_PRODUTO ORDER BY p.versao DESC;
---     row_item record;
---     nam VARCHAR;
---     descr VARCHAR;
---     sto INT;
---     m_versao INT;
--- BEGIN 
-
---     SELECT p.id INTO idd FROM produtos p WHERE p.id = ID_PRODUTO;
---     IF idd > 0  THEN
---         SELECT MAX(p.versao) INTO m_versao FROM produtos p WHERE p.id = ID_PRODUTO;
---         SELECT p.nome, p.descricao, p.stock INTO  nam,descr,sto FROM produtos p WHERE p.id = ID_PRODUTO and p.versao = m_versao;
---         json_modify(js,'$.nome',nam);
---         SET js = json_modify(js,'$.descricao',descr);
---         SET js = json_modify(js,'$.stock',sto);
---         SET js = JSON_MODIFY(js,'$.preço',[])
---         js:={'nome':nam,'descricao':descr,'stock': sto,'preco':[],'comentarios':[],}
---         OPEN cur;
---         LOOP
---         FETCH cur into row_item;
---         exit when not found;
---         IF row_item.versao = m_versao THEN
---             SET js = JSON_MODIFY(js,'append $.preço','current_price : %',row_item.preco);
---         ELSE
---             SET js = JSON_MODIFY(js,'append $.preço','prev_price : %',row_item.preco);
---         END IF;
-
---         end loop;
---         close cur;
-
-
---     ELSE THEN 
---          SET js = json_modify(js,'$.erro','nao existe nenhum produto com esse id');
---     END IF;
-
---     RETURN js;
--- END;
--- $$ LANGUAGE plpgsql;
 

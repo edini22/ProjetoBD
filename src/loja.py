@@ -241,7 +241,7 @@ def new_user(type_user):
         return flask.jsonify(response)
 
     if ((payload['tipo'] == "admin" or payload['tipo'] == "vendedor") and type_user == "vendedor"):
-        reponse = {'Status': StatusCodes['internal_error'],
+        response = {'Status': StatusCodes['internal_error'],
                    'error': 'vendedores nao têm este acesso!'}
         return flask.jsonify(response)
 
@@ -268,14 +268,14 @@ def new_user(type_user):
             cur.execute(addvend, valuesvend)
         tipo = payload['tipo']
         nome = payload['username']
-        reponse = {'Status': StatusCodes['success'],
+        response = {'Status': StatusCodes['success'],
                    'Results': f'{tipo} inserido!{nome}'}
 
         conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
 
@@ -283,7 +283,7 @@ def new_user(type_user):
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 # GET's ==========================================================================
 
@@ -338,18 +338,18 @@ def get_all_produts():
 
             Results.append(content)
 
-        reponse = {'Status': StatusCodes['success'], 'Results': Results}
+        response = {'Status': StatusCodes['success'], 'Results': Results}
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /produtos - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'Error': str(error)}
 
     finally:
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 
 # http://localhost:8080/dbproj/utilizadores
@@ -403,7 +403,7 @@ def get_all_buyers(user_id, type_user):
 
     # Verficar permissoes
     if(type_user == "comprador"):
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
         return jsonify(response)
 
@@ -424,18 +424,18 @@ def get_all_buyers(user_id, type_user):
                 row[1]), 'Username': row[2], 'Morada': row[3]}
             Results.append(content)
 
-        reponse = {'Status': StatusCodes['success'], 'results': Results}
+        response = {'Status': StatusCodes['success'], 'results': Results}
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /compradores - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': str(error)}
 
     finally:
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 
 # http://localhost:8080/dbproj/vendedores
@@ -447,12 +447,12 @@ def get_all_sellers(user_id, type_user):
 
     # Verficar permissoes
     if(type_user == "comprador"):
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "compradores nao têm este acesso!"}
         return jsonify(response)
 
     if(type_user == "vendedor"):
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "vendedorres nao têm este acesso!"}
         return jsonify(response)
 
@@ -473,18 +473,18 @@ def get_all_sellers(user_id, type_user):
                 row[1]), 'Username': row[2], 'NIF': row[3]}
             Results.append(content)
 
-        reponse = {'Status': StatusCodes['success'], 'results': Results}
+        response = {'Status': StatusCodes['success'], 'results': Results}
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /vendedores - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': str(error)}
 
     finally:
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 
 # Produtos =======================================================================
@@ -498,9 +498,9 @@ def new_product(user_id, type_user):
 
     # Verficar permissoes
     if(type_user != "vendedor"):
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "Apenas Vendedores podem adicionar produtos!"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     # Verficar dados
     if 'nome' not in payload:
@@ -605,14 +605,14 @@ def new_product(user_id, type_user):
                 payload['stock']), int(user_id), float(payload['tamanho']), payload['resolucao'])
             cur.execute(add, values)
         tipo = payload['tipo']
-        reponse = {'Status': StatusCodes['success'],
+        response = {'Status': StatusCodes['success'],
                    'Results': f'{tipo} inserido!'}
 
         conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'GET /produtos - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
 
@@ -620,7 +620,7 @@ def new_product(user_id, type_user):
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 
 # http://localhost:8080/dbproj/product/{product_id}
@@ -798,9 +798,9 @@ def order(user_id, type_user):
     payload = flask.request.get_json()
 
     if(type_user != "comprador"):
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "Apenas Compradores podem efetuar compras!"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     if 'cart' not in payload:
         response = {'status': StatusCodes['api_error'],
@@ -832,14 +832,14 @@ def order(user_id, type_user):
 
     try:
         cur.execute(add, values)
-        reponse = {'Status': StatusCodes['success'],
+        response = {'Status': StatusCodes['success'],
                    'Results': 'Compra efetuada!'}
 
         conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /compra - error: {error}')
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'Error': str(error)}
         conn.rollback()
 
@@ -847,7 +847,7 @@ def order(user_id, type_user):
         if conn is not None:
             conn.close()
 
-    return flask.jsonify(reponse)
+    return flask.jsonify(response)
 
 
 # Rating =========================================================================
@@ -861,14 +861,14 @@ def rating(user_id, type_user, produto_id):
     payload = flask.request.get_json()
 
     if type_user != 'comprador':
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "Apenas um comprador pode avaliar produtos"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     if 'valor' not in payload:
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "Tem de incluir o valor do rating"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     if 'comentario' not in payload:
         comentario = ' '
@@ -878,9 +878,9 @@ def rating(user_id, type_user, produto_id):
     valor = payload['valor']
 
     if valor > 5 or valor < 1:
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "O valor do rating tem de estar entre 1 e 5"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     conn = db_connection()
     cur = conn.cursor()
@@ -897,9 +897,9 @@ def rating(user_id, type_user, produto_id):
         print(f"DEBUG: Versao -> {versao}")
 
         if(versao == 0):
-            reponse = {
+            response = {
                 'Status': StatusCodes['internal_error'], 'error': "Para avaliar um produto tem de o comprar"}
-            return jsonify(reponse)
+            return jsonify(response)
 
         cur.execute("SELECT add_rating(%s, %s, %s, %s, %s)",
                     (valor, comentario, user_id, produto_id, versao))
@@ -971,9 +971,9 @@ def comment1(user_id, type_user, produto_id):
     payload = flask.request.get_json()
 
     if 'texto' not in payload:
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "Tem de incluir texto no seu comentario"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     conn = db_connection()
     cur = conn.cursor()
@@ -1006,16 +1006,16 @@ def comment1(user_id, type_user, produto_id):
 
 # http://localhost:8080/dbproj/questions/{product_id}/{parent_question_id}
 
-@app.route('/dbproj/questions/<product_id>/<parent_question_id>', methods=['POST'])
+@app.route('/dbproj/questions/<produto_id>/<comentario_pai_id>', methods=['POST'])
 @verify_token
 def comment2(user_id, type_user, produto_id, comentario_pai_id):
-    logger.info(f'POST /dbproj/questions/{produto_id}/{comentario_pai_id}')
+    logger.info(f'POST /dbproj/dbproj/questions/{produto_id}/{comentario_pai_id}')
     payload = flask.request.get_json()
 
     if 'texto' not in payload:
-        reponse = {
+        response = {
             'Status': StatusCodes['internal_error'], 'error': "Tem de incluir texto no seu comentario"}
-        return jsonify(reponse)
+        return jsonify(response)
 
     conn = db_connection()
     cur = conn.cursor()
@@ -1076,6 +1076,11 @@ def see_comments(produto_id):
                 content = {'ID': int(
                     idd), 'Texto': texto, 'Utilizador': utilizador, 'ID Comentario pai': comentario_pai}
             Results.append(content)
+        
+        if Results == []: 
+            response = {
+                'Status': StatusCodes['internal_error'], 'Resultado': 'O produto nao tem comentarios'}
+            return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'results': Results}
 
@@ -1114,6 +1119,11 @@ def see_notifications(user_id, type_user):
             content = {'ID': row[0], 'Notificacao': row[1], 'Data': row[2]}
             results.append(content)
 
+        if results == []:
+            response = {
+                'Status': StatusCodes['internal_error'], 'Resultado': 'Voce nao tem notificacoes'}
+            return flask.jsonify(response)
+
         response = {'Status': StatusCodes['success'], 'Results': results}
 
         cur.execute('SELECT notificacao_vista(%s);', (user_id,))
@@ -1142,27 +1152,18 @@ def get_product(produto_id):
     cur = conn.cursor()
 
     try:
-        cur.execute('GET_PRODUCT(%s)', produto_id)
-        rows = cur.fetchall()
+        cur.execute('SELECT GET_PRODUCT(%s)', produto_id)
+        rows = cur.fetchall()[0][0]
 
         logger.debug('GET /comentario - parse')
-        Results = []
-        for row in rows:
-            idd = row[0]
-            texto = row[1]
-            utilizador = row[2]
-            comentario_pai = row[3]
-            logger.debug(row)
+        
+        if rows == None:
+            response = {
+                'Status': StatusCodes['internal_error'], 'Resultado': f'Nao existe nenhum produto com o id {produto_id}'}
+            return flask.jsonify(response)
 
-            if comentario_pai == None:
-                content = {'ID': int(idd), 'Texto': texto,
-                           'Utilizador': utilizador}
-            else:
-                content = {'ID': int(
-                    idd), 'Texto': texto, 'Utilizador': utilizador, 'ID Comentario pai': comentario_pai}
-            Results.append(content)
 
-        response = {'Status': StatusCodes['success'], 'results': Results}
+        response = {'Status': StatusCodes['success'], 'results': rows}
 
         conn.commit()
 
