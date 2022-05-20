@@ -10,6 +10,15 @@ SELECT * from comentarios;
 
 SELECT * from compras;
 
+SELECT GET_report_year();
+
+SELECT EXTRACT(MONTH FROM CURRENT_DATE);
+
+INSERT INTO compras (compra_valor, compra_data, comprador_id) VALUES (3000, '2020-02-05', 4);
+
+SELECT COUNT(compra_id) "count", SUM(compra_valor) "sum", EXTRACT(MONTH from compra_data) "mes"
+        FROM compras WHERE AGE(CURRENT_DATE, '2022-03-22') < '12 months' GROUP BY "mes";
+
 SELECT add_compra('[
             {
                 "product_id": 1,

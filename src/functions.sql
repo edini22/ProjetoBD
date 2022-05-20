@@ -550,13 +550,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP FUNCTION GET_report_year();
 CREATE OR REPLACE FUNCTION GET_report_year()
 RETURNS JSONB
 AS
 $$
 DECLARE
-js JSONB ;
+i record;
+js JSONB;
+js_mes JSONB;
     BEGIN
+    js :=  jsonb_build_array();
+
+    for i in 
+        SELECT COUNT(compra_id) "count", SUM(compra_valor) "sum", EXTRACT(MONTH from compra_data) "mes"
+        FROM compras WHERE AGE(CURRENT_DATE, '2022-03-22') < '12 months' GROUP BY "mes"
+        loop
+            js_mes := json_build_object('Mes', i.mes)::jsonb;
+            raise notice '%', js_mes;
+            js_mes = js_mes::jsonb || json_build_object('Valor total', i.sum)::jsonb;
+            raise notice '%', js_mes;
+            js_mes = js_mes::jsonb || json_build_object('Compras', i.count)::jsonb;
+            raise notice '%', js_mes;
+            js = js::jsonb || js_mes::jsonb;
+            
+        end loop;
     RETURN js;
 END;
 $$ LANGUAGE plpgsql;

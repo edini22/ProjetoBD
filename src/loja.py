@@ -1203,15 +1203,20 @@ def report_year(user_id, type_user):
     conn = db_connection()
     cur = conn.cursor()
 
+    print(1)
+
     try:
         cur.execute('SELECT GET_report_year()')
         rows = cur.fetchall()[0][0]
-
         logger.debug('GET /report/year - parse')
+        print('ROWS')
+        print(rows)
+        # if rows == []:
+        #     response = {'Status': StatusCodes['api_error'], 'Erro': "Nao existe historico dos ultimos 12 meses"}
+        #     return flask.jsonify(response)
 
         response = {'Status': StatusCodes['success'], 'results': rows}
-
-        conn.commit()
+        # conn.commit()
 
     except(Exception, psycopg2.DatabaseError) as error:
         logger.error(f'POST /user - error: {error}')
@@ -1222,6 +1227,8 @@ def report_year(user_id, type_user):
     finally:
         if conn is not None:
             conn.close()
+
+    return flask.jsonify(response)
     
 
 # =============================================================================================================
